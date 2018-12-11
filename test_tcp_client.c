@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <arpa/inet.h>
 #define PORT 8080
 
 int main(int argc, char const *argv[]){
@@ -19,7 +20,7 @@ int main(int argc, char const *argv[]){
         return -1;
     }
 
-    memset(&serv_addr, '0', sizeof(serv_addr));
+    memset(&serv_addr, '0', sizeof(serv_addr)); // memset(void *dest, int c, size_t count) -> dest의 count 개의 바이트를 값 c로 설정함
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
