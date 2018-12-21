@@ -20,7 +20,8 @@ static unsigned int hook_func (void *priv,
 	if (!skb)
 		return NF_ACCEPT;
 
-	struct iphdr *iph = (struct iphdr *)skb_network_header(skb);
+	struct iphdr *iph;
+	iph = (struct iphdr *)skb_network_header(skb);
 
 	printk(KERN_INFO "NF_IP_HOOK:\n");
 	printk(KERN_INFO "IP address = %u DEST = %u\n", iph->saddr, iph->daddr);
