@@ -14,7 +14,7 @@ static unsigned int hook_func (void *priv,
     return NF_ACCEPT;
 }
 
-static int init(void) {
+static int my_init(void) {
     nfho.hook = hook_func;
     nfho.hooknum = NF_INET_PRE_ROUTING;
     nfho.pf = PF_INET;
@@ -25,10 +25,10 @@ static int init(void) {
     return 0;
 }
 
-static void exit(void) {
+static void my_exit(void) {
     nf_unregister_net_hook(NULL, &nfho);
 }
 
-module_init(init);
-module_exit(exit);
+module_init(my_init);
+module_exit(my_exit);
 
