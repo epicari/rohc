@@ -2,6 +2,7 @@
 #include <linux/init.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#include <linux/net_namespace.h>
 
 static struct nf_hook_ops nfho;
 
@@ -20,13 +21,13 @@ static int my_init(void) {
     nfho.pf = PF_INET;
     nfho.priority = NF_IP_PRI_FIRST;
 
-    nf_register_net_hook(NULL, &nfho);
+    nf_register_net_hook(struct net *net, &nfho);
 
     return 0;
 }
 
 static void my_exit(void) {
-    nf_unregister_net_hook(NULL, &nfho);
+    nf_unregister_net_hook(struct net *net, &nfho);
 }
 
 module_init(my_init);
