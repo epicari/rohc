@@ -18,9 +18,10 @@ static unsigned int hook_func (void *priv,
 								struct sk_buff *skb,
 								const struct nf_hook_state *state) {
 
-	struct iphdr *iph;
+	struct iphdr *iph = ip_hdr(skb);
 	
-	iph = (struct iphdr *)skb_network_header(skb);
+	//struct iphdr *iph;
+	//iph = (struct iphdr *)skb_network_header(skb);
 
 	if (!iph) {
 		
