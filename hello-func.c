@@ -67,6 +67,6 @@ static void my_exit(void) {
 	nf_unregister_hook (&nfho);
 }
 
-module_init (my_init);
-module_exit (my_exit);
+//module_init (my_init);
+//module_exit (my_exit);
 
