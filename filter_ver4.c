@@ -19,25 +19,15 @@ static unsigned int hook_func (void *priv,
 								const struct nf_hook_state *state) {
 
 	struct iphdr *iph = ip_hdr(skb);
-	
-	//struct iphdr *iph;
-	//iph = (struct iphdr *)skb_network_header(skb);
+	struct ethhdr *eth = eth_hdr(skb);
 
 	if (!iph) {
 		
 		return NF_ACCEPT;
 	}
 
-	if (iph->protocol == IPPROTO_ICMP) {
-		printk(KERN_INFO "=== BEGIN ICMP ===\n");
-		printk(KERN_INFO "IP header: original source: %d.%d.%d.%d\n", NIPQUAD(iph->saddr));
-
-		iph->saddr = iph->saddr ^ 0x10000000;
-
-		printk(KERN_INFO "IP header: modified source: %d.%d.%d.%d\n", NIPQUAD(iph->saddr));
-		printk(KERN_INFO "IP header: original destin: %d.%d.%d.%d\n", NIPQUAD(iph->daddr));
-		printk(KERN_INFO "=== END ICMP ===\n");
-	}
+	printk("NF_IP_HOOK:\n");
+	printk("src mac %pM, dst mac %pM\n", eth->h_source, eth->h_dest);
 
     return NF_ACCEPT;
 
