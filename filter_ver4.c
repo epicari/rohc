@@ -18,20 +18,9 @@ static unsigned int hook_func (void *priv,
 
 	struct iphdr *iph = (struct iphdr *)skb_network_header(skb);
 
-	if (!iph) {
-		
-		return NF_ACCEPT;
-	}
-
 	printk("NF_IP_HOOK:\n");
 	printk("IP address = %u DEST = %u\n", iph->saddr, iph->daddr);
 	//printk("src mac %pM, dst mac %pM\n", eth->h_source, eth->h_dest);
-
-	if (iph->protocol == IPPROTO_ICMP) {
-
-		printk("ICMP\n");
-
-	}
 
     return NF_ACCEPT;
 
