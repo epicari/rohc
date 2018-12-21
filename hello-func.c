@@ -52,7 +52,7 @@ static unsigned int hook_func (unsigned int hooknum,
 
 }
 
-static int my_init(void){
+static int my_init(void) {
 
 	nfho.hook = hook_func;
 	nfho.pf = PF_INET;
