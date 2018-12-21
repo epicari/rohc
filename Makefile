@@ -1,6 +1,8 @@
 
 obj-m := filter_ver4.o \
-		test.o
+		test.o \
+		hello.o \
+		hello_test.o 
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
