@@ -50,7 +50,7 @@ static struct nf_hook_ops nfho = {
     .hook     = hook_func,
     .hooknum  = NF_INET_PRE_ROUTING,
     .pf       = PF_INET,
-    .Priority = NF_IP_PRI_FIRST,
+    .priority = NF_IP_PRI_FIRST,
 };
 
 static __init int my_init(void){
