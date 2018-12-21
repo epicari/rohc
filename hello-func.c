@@ -25,16 +25,17 @@ static unsigned int hook_func (unsigned int hooknum,
 		       			int (*okfn)(struct sk_buff *)) {
 
 	struct iphdr *iph = ip_hdr(skb);
+	unsigned long saddr = 0;
 
 	if (!iph){
 		return NF_ACCEPT;
 	}
 
-	if (iph->protocol == IPPROTO_TCP){
+	if (iph->protocol == IPPROTO_TCP) {
 		return NF_ACCEPT;
 	}
 
-	if (iph->protocol == IPPROTO_ICMP){
+	if (iph->protocol == IPPROTO_ICMP) {
 		printk(KERN_INFO "=== BEGIN ICMP ===\n");
 		printk(KERN_INFO "IP header: original source: %d.%d.%d.%d\n", NIPQUAD(iph->saddr));
 
@@ -43,8 +44,6 @@ static unsigned int hook_func (unsigned int hooknum,
 		printk(KERN_INFO "IP header: modified source: %d.%d.%d.%d\n", NIPQUAD(iph->saddr));
 		printk(KERN_INFO "IP header: original destin: %d.%d.%d.%d\n", NIPQUAD(iph->daddr));
 		printk(KERN_INFO "=== END ICMP ===\n");
-
-		return NF_ACCEPT;
 	}
 
     return NF_ACCEPT;
@@ -67,6 +66,6 @@ static void my_exit(void) {
 	nf_unregister_hook (&nfho);
 }
 
-//module_init (my_init);
-//module_exit (my_exit);
+module_init (my_init);
+module_exit (my_exit);
 
