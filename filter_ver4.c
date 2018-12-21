@@ -34,7 +34,6 @@ static int my_init(void) {
 	nfho.priority = NF_IP_PRI_FIRST;
 	nf_register_net_hook (NULL, &nfho);
 
-	return 0;
 }
 
 static void my_exit(void) {
