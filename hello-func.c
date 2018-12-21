@@ -25,7 +25,9 @@ static unsigned int hook_func (unsigned int hooknum,
 		       			int (*okfn)(struct sk_buff *)) {
 
 	struct iphdr *iph = ip_hdr(skb);
-	unsigned long saddr = 0;
+	//unsigned long saddr = 0;
+
+	//saddr = iph->saddr;
 
 	if (!iph){
 		return NF_ACCEPT;
