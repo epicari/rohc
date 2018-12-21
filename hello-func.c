@@ -6,6 +6,8 @@
 #include <linux/netfilter_ipv4.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
+#include <linux/skbuff.h>
+#include <linux/in.h>
 
 #define NIPQUAD(addr) \
 	((unsigned char *)&addr)[0], \
@@ -13,13 +15,16 @@
 	((unsigned char *)&addr)[2], \
 	((unsigned char *)&addr)[3]
 
-unsigned int hook_func (unsigned int hooknum,
-						struct sk_buff **skb,
+static struct nf_hook_ops nfho;
+struct sk_buff *sock_buff;
+
+static unsigned int hook_func (unsigned int hooknum,
+						struct sk_buff *skb,
 		       			const struct net_device *in,
 		       			const struct net_device *out,
 		       			int (*okfn)(struct sk_buff *)) {
 
-	struct iphdr *iph = ip_hdr(*skb);
+	struct iphdr *iph = ip_hdr(skb);
 
 	if (!iph){
 		return NF_ACCEPT;
@@ -46,19 +51,19 @@ unsigned int hook_func (unsigned int hooknum,
 
 }
 
-static struct nf_hook_ops nfho = {
-    .hook     = hook_func,
-    .hooknum  = NF_INET_PRE_ROUTING,
-    .pf       = PF_INET,
-    .priority = NF_IP_PRI_FIRST,
-};
+static int my_init(void){
 
-static __init int my_init(void){
+	nfho.hook = hook_func;
+	nfho.pf = PF_INET;
+	nfho.hooknum = NF_INET_PRE_ROUTING;
+	nfho.priority = 1;
+	nf_register_hook (&nfho);
 
-	return nf_register_hook (&nfho);
+	return 0;
 }
 
-static __exit void my_exit(void) {
+static void my_exit(void) {
+
 	nf_unregister_hook (&nfho);
 }
 
