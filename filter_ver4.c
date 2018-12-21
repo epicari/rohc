@@ -12,9 +12,11 @@ static unsigned int hook_func (void *priv,
 								struct sk_buff *skb,
 								const struct nf_hook_state *state) {
 
-	struct iphdr *iph = ip_hdr(skb);
+	//struct iphdr *iph = ip_hdr(skb);
 	//struct ethhdr *eth = eth_hdr(skb);
 	//struct icmphdr *icmh = icmp_hdr(skb);
+
+	struct iphdr *iph = (struct iphdr *)skb_network_header(skb);
 
 	if (!iph) {
 		
@@ -22,6 +24,7 @@ static unsigned int hook_func (void *priv,
 	}
 
 	printk("NF_IP_HOOK:\n");
+	printk("IP address = %u DEST = %u\n", iph->saddr, iph->daddr);
 	//printk("src mac %pM, dst mac %pM\n", eth->h_source, eth->h_dest);
 
 	if (iph->protocol == IPPROTO_ICMP) {
