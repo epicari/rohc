@@ -22,6 +22,11 @@ static unsigned int hook_func (void *priv,
 	
 	iph = (struct iphdr *)skb_network_header(skb);
 
+	if (!iph) {
+		
+		return NF_ACCEPT;
+	}
+
 	if (iph->protocol == IPPROTO_ICMP) {
 		printk(KERN_INFO "=== BEGIN ICMP ===\n");
 		printk(KERN_INFO "IP header: original source: %d.%d.%d.%d\n", NIPQUAD(iph->saddr));
