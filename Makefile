@@ -1,5 +1,5 @@
 
-obj-m := hello-func.o
+obj-m := filter_ver4.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
