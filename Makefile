@@ -1,5 +1,6 @@
 
-obj-m := hello_test.o 
+obj-m := hello_test.o \
+		hello.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
