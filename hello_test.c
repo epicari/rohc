@@ -12,6 +12,7 @@ static unsigned int hook_func (void *priv,
                         const struct nf_hook_state *state) {
     
     printk(KERN_INFO "Packet !\n");
+    pr_info("Packet !\n");
 
     return NF_ACCEPT;
 }
