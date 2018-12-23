@@ -20,9 +20,10 @@ static unsigned int hook_func (void *priv,
 
 static int my_init(void) {
     nfho.hook = hook_func;
-    nfho.hooknum = NF_INET_PRE_ROUTING;
-    nfho.pf = PF_INET;
-    nfho.priority = NF_IP_PRI_FIRST;
+    nfho.hooknum = NF_INET_LOCAL_IN;
+    nfho.pf = NFPROTO_IPV4;
+    nfho.priority = NF_IP_PRI_CONNTRACK_CONFIRM - 1;
+	nfho.priv = NULL;
 
     nf_register_net_hook(&hook_net, &nfho);
 
