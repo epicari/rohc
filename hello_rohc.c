@@ -6,9 +6,9 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
-#include <linux/rohc.h>
-#include <linux/rohc_comp.h>
-#include <linux/rohc_decomp.h>
+#include <linux/rohc/rohc.h>
+#include <linux/rohc/rohc_comp.h>
+#include <linux/rohc/rohc_decomp.h>
 
 static struct nf_hook_ops nfho;
 
