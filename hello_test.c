@@ -3,6 +3,7 @@
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 #include <linux/net_namespace.h>
+#include <linux/skbuff.h>
 
 static struct nf_hook_ops nfho;
 static struct net hook_net;
