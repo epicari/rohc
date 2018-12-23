@@ -1,6 +1,5 @@
 #include <linux/module.h>
 #include <linux/init.h>
-#include <printk.h>
 
 static int setup(void) {
     printk(KERN_INFO "Hello, World !\n");
