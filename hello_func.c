@@ -6,13 +6,15 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
+#include <linux/netdevice.h>
 
 static struct nf_hook_ops nfho;
+static struct nf_hook_state nhs;
 static struct net hook_net;
 
 static unsigned int hook_func (void *priv,
                         struct sk_buff *skb,
-                        const struct nf_hook_state *state) {
+                        const struct nf_hook_state *nhs) {
     
     struct iphdr *iph;
 	struct tcphdr *tph;
@@ -43,16 +45,16 @@ static unsigned int hook_func (void *priv,
 static int my_init(void) {
     nfho.hook = hook_func;
     nfho.hooknum = NF_INET_PRE_ROUTING;
-    nfho.pf = PF_INET;
+    nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
 
-    nf_register_net_hook(&hook_net, nfho);
+    nf_register_net_hook(&hook_net, &nfho);
 
     return 0;
 }
 
 static void my_exit(void) {
-    nf_unregister_net_hook(&hook_net, nfho);
+    nf_unregister_net_hook(&hook_net, &nfho);
 }
 
 module_init(my_init);
