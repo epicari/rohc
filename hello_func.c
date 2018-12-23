@@ -9,12 +9,11 @@
 #include <linux/netdevice.h>
 
 static struct nf_hook_ops nfho;
-static struct nf_hook_state nhs;
 static struct net hook_net;
 
 static unsigned int hook_func (void *priv,
                         struct sk_buff *skb,
-                        const struct nf_hook_state *nhs) {
+                        const struct nf_hook_state *state) {
     
     struct iphdr *iph;
 	struct tcphdr *tph;
@@ -44,9 +43,10 @@ static unsigned int hook_func (void *priv,
 
 static int my_init(void) {
     nfho.hook = hook_func;
-    nfho.hooknum = NF_INET_PRE_ROUTING;
+    nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_FIRST;
+    nfho.priority = NF_IP_PRI_CONNTRACK_CONFIRM - 1;
+	nfho.priv = NULL;
 
     nf_register_net_hook(&hook_net, &nfho);
 
