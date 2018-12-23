@@ -6,14 +6,18 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
-#include <linux/rohc/rohc.h>
-#include <linux/rohc/rohc_comp.h>
-#include <linux/rohc/rohc_decomp.h>
+#include "rohc.h"
+#include "rohc_comp.h"
+#include "rohc_decomp.h"
+
+#define BUFFER_SIZE 2048
 
 static struct nf_hook_ops nfho;
 
 static int gen_random_num(const struct rohc_comp *const comp,
 							void *const user_context);
+
+static int rohc_comp(struct sk_buff *skb);
 
 static struct rohc_comp * create_compressor(void);
 
@@ -39,7 +43,7 @@ static unsigned int hook_func (void *priv,
     return NF_ACCEPT;
 }
 
-static rohc_comp(struct sk_buff *skb) {
+static int rohc_comp(struct sk_buff *skb) {
 
 	struct rohc_comp *compressor;
 	unsigned char rohc_buffer[BUFFER_SIZE];
