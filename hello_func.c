@@ -4,8 +4,8 @@
 #include <linux/netfilter_ipv4.h>
 #include <linux/net_namespace.h>
 #include <linux/skbuff.h>
-#include <linun/ip.h>
-#include <linun/tcp.h>
+#include <linux/ip.h>
+#include <linux/tcp.h>
 
 static struct nf_hook_ops nfho;
 static struct net hook_net;
