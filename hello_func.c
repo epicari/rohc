@@ -17,7 +17,8 @@ static unsigned int hook_func (void *priv,
     struct iphdr *iph;
 	struct tcphdr *tph;
 	
-	iph = (struct iphdr *)skb_network_header(skb);
+	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
 
     pr_info("Packet !\n");
 
@@ -25,7 +26,7 @@ static unsigned int hook_func (void *priv,
 		return NF_ACCEPT;
 	
 	if (iph->protocol == IPPROTO_TCP) {
-		tph = (struct tcphdr *)(skb_transport_header(skb) + skb_network_header(skb));
+		
 		if (tph)
 			pr_info("SRC: (%pI4):%d --> DST: (%pI4):%d\n",
 					&iph->saddr,
