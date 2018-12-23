@@ -1,7 +1,8 @@
 
 obj-m := hello.o \
 		hello_test.o \
-		hello_func.o
+		hello_func.o \
+		hello_rohc.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
