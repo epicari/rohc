@@ -46,13 +46,13 @@ static int my_init(void) {
     nfho.pf = PF_INET;
     nfho.priority = NF_IP_PRI_FIRST;
 
-    nf_register_net_hook(&hook_net, &nfho);
+    nf_register_net_hook(&hook_net, nfho);
 
     return 0;
 }
 
 static void my_exit(void) {
-    nf_unregister_net_hook(&hook_net, &nfho);
+    nf_unregister_net_hook(&hook_net, nfho);
 }
 
 module_init(my_init);
