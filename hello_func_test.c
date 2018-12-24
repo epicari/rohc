@@ -9,8 +9,8 @@
 
 #include <linux/rohc/rohc_buf.h>
 #include <linux/rohc/rohc_comp.h>
-#include <time.h>
-#include <string.h>
+#include <linux/time.h>
+#include <linux/string.h>
 
 #define BUFFER_SIZE 2048
 #define FAKE_PAYLOAD "hello, world!"
