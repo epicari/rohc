@@ -96,20 +96,21 @@ static int rohc_comp(struct sk_buff *skb) {
 		goto release_compressor;
 	}
 
-	static struct rohc_comp * create_compressor(void) {
-	
-		struct rohc_comp *compressor;
-
-		compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-									gen_random_num, NULL);
-
-		rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
-
-		return compressor;
-	}
 release_compressor:
 	rohc_comp_free(compressor);
 	return 1;
+}
+
+static struct rohc_comp * create_compressor(void) {
+	
+	struct rohc_comp *compressor;
+
+	compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+								gen_random_num, NULL);
+
+	rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
+
+	return compressor;
 }
 
 static int my_init(void) {
