@@ -60,7 +60,7 @@ static int test(void) {
 	rohc_iph->ihl = 5;
 	ip_packet.len += rohc_iph->ihl * 4;
 	rohc_iph->tos = 0;
-	rohc_iph->tot_len = htons(ip_packet.len + skb->data_len);
+	rohc_iph->tot_len = htons(ip_packet.len + strlen(FAKE_PAYLOAD));
 	rohc_iph->id = 0;
 	rohc_iph->frag_off = 0;
 	rohc_iph->ttl = 1;
