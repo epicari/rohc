@@ -81,7 +81,7 @@ static int test(void) {
 		pr_info("\n");
 	}
 
-	return 0;
+	return NF_ACCEPT;
 }
 
 
