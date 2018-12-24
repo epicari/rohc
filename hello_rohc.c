@@ -51,6 +51,7 @@ static int test(void) {
 	unsigned char ip_buffer[BUFFER_SIZE];
 	struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
 	struct iphdr *rohc_iph;
+	size_t i;
 
 	pr_info("Test Fake Packet\n");
 
