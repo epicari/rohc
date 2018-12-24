@@ -38,19 +38,19 @@ static unsigned int hook_func (void *priv,
 	if (iph->protocol == IPPROTO_TCP) {
 		pr_info("Hello, TCP\n");
 
-		rohc_comp(skb);
+		rohc_comp(iph);
 	}
 
     return NF_ACCEPT;
 }
 
-static int rohc_comp(struct sk_buff *skb) {
+static int rohc_comp(struct iphdr *iph) {
 
 	struct rohc_comp *compressor;
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
 	rohc_status_t status;
-	
+
 	/*
 	unsigned int seed;
 	seed = time(NULL);
@@ -59,7 +59,7 @@ static int rohc_comp(struct sk_buff *skb) {
 
 	compressor = create_compressor();
 
-	status = rohc_compress4(compressor, &skb->data, &rohc_packet);
+	status = rohc_compress4(compressor, iph, &rohc_packet);
 
 	if(status == ROHC_STATUS_SEGMENT) {
 		pr_info("ROHC segment\n");
@@ -81,7 +81,7 @@ static int rohc_comp(struct sk_buff *skb) {
 		compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_random_num, NULL);
 
-		rohc_comp_enable_profile(compressor, ROHC_PROFILE_TCP);
+		rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
 
 		return compressor;
 	}
