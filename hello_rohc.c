@@ -11,7 +11,7 @@
 #include <linux/rohc/rohc_comp.h>
 #include <linux/rohc/rohc_decomp.h>
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 10000
 
 static struct nf_hook_ops nfho;
 
@@ -47,6 +47,7 @@ static unsigned int hook_func (void *priv,
 static int rohc_comp(struct sk_buff *skb) {
 
 	struct rohc_comp *compressor;
+	rohc_status_t status;
 	
 	unsigned char ip_buffer[BUFFER_SIZE];
 	struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
@@ -70,14 +71,6 @@ static int rohc_comp(struct sk_buff *skb) {
 	rohc_iph->daddr = htonl(0x05060708);
 
 	rohc_buf_append(&ip_packet, skb->data, skb->data_len);
-
-	rohc_status_t status;
-
-	/*
-	unsigned int seed;
-	seed = time(NULL);
-	srand(seed);
-	*/
 
 	compressor = create_compressor();
 
