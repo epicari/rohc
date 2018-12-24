@@ -7,14 +7,8 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 
-#include <linux/rohc/stdlib.h>
 #include <linux/rohc/rohc_buf.h>
 #include <linux/rohc/rohc_comp.h>
-#include <linux/time.h>
-#include <linux/string.h>
-
-#define BUFFER_SIZE 2048
-#define FAKE_PAYLOAD "hello, world!"
 
 static struct nf_hook_ops nfho;
 
@@ -62,7 +56,7 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 	return 0;
 }
 
-static int my_init(void) {
+static int __init my_init(void) {
     nfho.hook = hook_func;
     nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
@@ -74,7 +68,7 @@ static int my_init(void) {
     return 0;
 }
 
-static void my_exit(void) {
+static void __exit my_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
