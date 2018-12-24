@@ -81,7 +81,7 @@ static int rohc_comp(struct sk_buff *skb) {
 
 	compressor = create_compressor();
 
-	status = rohc_compress4(compressor, &skb, &rohc_packet);
+	status = rohc_compress4(compressor, ip_packet, &rohc_packet);
 
 	if(status == ROHC_STATUS_SEGMENT) {
 		pr_info("ROHC segment\n");
