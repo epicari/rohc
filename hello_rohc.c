@@ -18,7 +18,7 @@ static struct nf_hook_ops nfho;
 static int gen_random_num(const struct rohc_comp *const comp,
 							void *const user_context);
 
-static int rohc_comp(struct iphdr *iph);
+static int rohc_comp(struct sk_buff *skb);
 
 static struct rohc_comp * create_compressor(void);
 
@@ -38,17 +38,19 @@ static unsigned int hook_func (void *priv,
 	if (iph->protocol == IPPROTO_TCP) {
 		pr_info("Hello, TCP\n");
 
-		rohc_comp(&iph);
+		rohc_comp(skb);
 	}
 
     return NF_ACCEPT;
 }
 
-static int rohc_comp(struct iphdr *iph) {
+static int rohc_comp(struct sk_buff *skb) {
 
 	struct rohc_comp *compressor;
+	
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
+	rohc_buf_append(&skb, skb->data, skb->data_len);
 	rohc_status_t status;
 
 	/*
@@ -59,7 +61,7 @@ static int rohc_comp(struct iphdr *iph) {
 
 	compressor = create_compressor();
 
-	status = rohc_compress4(compressor, &iph, &rohc_packet);
+	status = rohc_compress4(compressor, &skb, &rohc_packet);
 
 	if(status == ROHC_STATUS_SEGMENT) {
 		pr_info("ROHC segment\n");
