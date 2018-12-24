@@ -49,6 +49,7 @@ static int rohc_comp(struct sk_buff *skb) {
 	struct rohc_comp *compressor;
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
+	rohc_status_t status;
 	
 	/*
 	unsigned int seed;
