@@ -7,11 +7,11 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 
+#include <linux/rohc/stdlib.h>
 #include <linux/rohc/rohc_buf.h>
 #include <linux/rohc/rohc_comp.h>
 #include <linux/time.h>
 #include <linux/string.h>
-#include <linux/stdlib.h>
 
 #define BUFFER_SIZE 2048
 #define FAKE_PAYLOAD "hello, world!"
