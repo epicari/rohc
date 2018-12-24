@@ -6,6 +6,7 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
+#include <linux/time.h>
 #include "rohc.h"
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
@@ -55,7 +56,7 @@ static int rohc_comp(struct sk_buff *skb) {
 
 	compressor = create_compressor();
 
-	status = rohc_compress4(compressor, skb->data, &rohc_packet);
+	status = rohc_compress4(compressor, &skb->data, &rohc_packet);
 
 	if(status == ROHC_STATUS_SEGMENT) {
 		pr_info("ROHC segment\n");
