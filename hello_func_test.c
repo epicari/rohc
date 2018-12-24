@@ -41,7 +41,6 @@ static unsigned int hook_func (void *priv,
 	if (iph->protocol == IPPROTO_TCP) {
 		
 		if (tph) {
-			srand(time(NULL));
 			pr_info("compressor\n");
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 										gen_false_random_num, NULL);
