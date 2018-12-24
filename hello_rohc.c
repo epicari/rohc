@@ -48,9 +48,29 @@ static int rohc_comp(struct sk_buff *skb) {
 
 	struct rohc_comp *compressor;
 	
+	unsigned char ip_buffer[BUFFER_SIZE];
+	struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
+
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
-	rohc_buf_append(&skb, skb->data, skb->data_len);
+	struct iphdr *rohc_iph;
+
+	rohc_iph = (struct iphdr *) rohc_buf_data(ip_packet);
+	rohc_iph->version = 4;
+	rohc_iph->ihl = 5;
+	ip_packet.len += rohc_iph->ihl * 4;
+	rohc_iph->tos = 0;
+	rohc_iph->tot_len = htons(ip_packet.len + skb->data_len);
+	rohc_iph->id = 0;
+	rohc_iph->frag_off = 0;
+	rohc_iph->ttl = 1;
+	rohc_iph->protocol = 134;
+	rohc_iph->check = 0x3fa9;
+	rohc_iph->saddr = htonl(0x01020304);
+	rohc_iph->daddr = htonl(0x05060708);
+
+	rohc_buf_append(&ip_packet, skb->data, skb->data_len);
+
 	rohc_status_t status;
 
 	/*
