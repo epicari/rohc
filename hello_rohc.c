@@ -7,9 +7,9 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 #include <linux/time.h>
-#include <rohc/rohc.h>
-#include <rohc/rohc_comp.h>
-#include <rohc/rohc_decomp.h>
+#include <linux/rohc/rohc.h>
+#include <linux/rohc/rohc_comp.h>
+#include <linux/rohc/rohc_decomp.h>
 
 #define BUFFER_SIZE 2048
 
@@ -50,9 +50,11 @@ static int rohc_comp(struct sk_buff *skb) {
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
 	
+	/*
 	unsigned int seed;
 	seed = time(NULL);
 	srand(seed);
+	*/
 
 	compressor = create_compressor();
 
