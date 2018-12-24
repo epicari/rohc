@@ -80,6 +80,8 @@ static int test(void) {
 	if (i != 0 && (i % 8) != 0) {
 		pr_info("\n");
 	}
+
+	return 0;
 }
 
 
