@@ -7,9 +7,9 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 #include <linux/time.h>
-#include <linux/rohc.h>
-#include <linux/rohc_comp.h>
-#include <linux/rohc_decomp.h>
+#include <rohc/rohc.h>
+#include <rohc/rohc_comp.h>
+#include <rohc/rohc_decomp.h>
 
 #define BUFFER_SIZE 2048
 
