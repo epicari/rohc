@@ -7,8 +7,8 @@
 #include <linux/ip.h>
 #include <linux/tcp.h>
 
-#include <rohc/rohc_buf.h>
-#include <rohc/rohc_comp.h>
+#include "rohc_comp.h"
+#include "rohc.h"
 
 static struct nf_hook_ops nfho;
 
