@@ -12,11 +12,6 @@ pkglibexecdir = $(libexecdir)/rohc
 
 oldincludedir = /usr/include
 
-cppcheck:
-	$(AM_V_GEN)cppcheck \
-				--quiet \
-				-I /usr/include/
-
 all:
 
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
