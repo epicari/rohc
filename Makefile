@@ -4,7 +4,7 @@ obj-m := hello_func_test.o
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-INC := -I/usr/include/rohc
+INC := /usr/include/rohc
 
 all:
 
