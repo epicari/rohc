@@ -2,19 +2,14 @@
 obj-m := hello_func_test.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
-
 PWD := $(shell pwd)
 
-pkgdatadir = $(includedir)/rohc
-pkgincludedir = $(includedir)/rohc
-pkglibdir = $(libdir)/rohc
-pkglibexecdir = $(libexecdir)/rohc
-
-oldincludedir = /usr/include
+INC := -I/usr/include/rohc
 
 all:
 
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
+	$(MAKE) -I $(INC)
 
 clean:
 
