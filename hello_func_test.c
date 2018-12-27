@@ -36,6 +36,7 @@ static unsigned int hook_func (void *priv,
 		
 		if (tph) {
 			pr_info("compressor\n");
+/*			
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 										gen_false_random_num, NULL);
 			if (compressor == NULL) {
@@ -47,7 +48,7 @@ static unsigned int hook_func (void *priv,
 		else
 			return NF_DROP;
 	}
-
+*/
     return NF_ACCEPT;
 }
 
