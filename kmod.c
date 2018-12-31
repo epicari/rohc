@@ -63,13 +63,13 @@ static unsigned int hook_func (void *priv,
 	
 	if (iph->protocol == IPPROTO_TCP) {
 		
-		if (tph)
+		if (tph) {
 			pr_info("SRC: (%pI4):%d --> DST: (%pI4):%d\n",
 					&iph->saddr,
 					ntohs(tph->source),
 					&iph->daddr,
 					ntohs(tph->dest));
-
+		
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 										gen_false_random_num, NULL);
 			if (compressor == NULL) {
@@ -77,7 +77,7 @@ static unsigned int hook_func (void *priv,
 				return NF_DROP;
 			}
 			rohc_comp_free(compressor);
-
+		}
 		else
 			return NF_DROP;
 	}
