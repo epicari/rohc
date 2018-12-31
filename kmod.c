@@ -52,7 +52,8 @@ static unsigned int hook_func (void *priv,
     
     struct iphdr *iph;
 	struct tcphdr *tph;
-	
+	struct rohc_comp *compressor;
+
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
 
