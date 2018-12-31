@@ -73,6 +73,7 @@ static unsigned int hook_func (void *priv,
 		
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 										gen_false_random_num, NULL);
+			pr_info("Compressor is ready\n");
 			if (compressor == NULL) {
 				pr_info("failed\n");
 				return NF_DROP;
