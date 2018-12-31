@@ -43,6 +43,9 @@
 
 static struct nf_hook_ops nfho;
 
+static int gen_false_random_num(const struct rohc_comp *const comp,
+								void *const user_context);
+
 static unsigned int hook_func (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
@@ -66,11 +69,25 @@ static unsigned int hook_func (void *priv,
 					ntohs(tph->source),
 					&iph->daddr,
 					ntohs(tph->dest));
+
+			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+										gen_false_random_num, NULL);
+			if (compressor == NULL) {
+				pr_info("failed\n");
+				return NF_DROP;
+			}
+			rohc_comp_free(compressor);
+
 		else
 			return NF_DROP;
 	}
 
     return NF_ACCEPT;
+}
+
+static int gen_false_random_num(const struct rohc_comp *const comp,
+								void *const user_context) {
+	return 0;
 }
 
 static int my_init(void) {
