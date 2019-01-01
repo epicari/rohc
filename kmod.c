@@ -70,7 +70,15 @@ static unsigned int hook_func (void *priv,
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, iph->tot_len, iph);
 	
-    pr_info("Packet !\n");
+	if (ih == NULL) {
+		pr_info("TRUNCATED\n");
+		return NF_DROP;
+	}
+
+	pr_info("SRC=%pI4 DST=%pI4 \n", &ih->saddr, &ih->daddr);
+	
+	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
+			&ih->tot_len, &ih->tos, &ih->ttl, &ih->id, &ih->frag_off);
 
 	if (!skb)
 		return NF_ACCEPT;
