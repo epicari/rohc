@@ -80,7 +80,7 @@ static unsigned int hook_func (void *priv,
 	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
 			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
 	
-	rohc_buf_append(&ip_buffer, skb->data, ntohs(ih->tot_len));
+	rohc_buf_append(ip_packet, skb->data, ntohs(ih->tot_len));
 
 	if (iph->protocol == IPPROTO_TCP) {
 		
