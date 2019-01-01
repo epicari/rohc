@@ -41,6 +41,8 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
+#define BUFFER_SIZE 2048
+
 static struct nf_hook_ops nfho;
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
@@ -52,7 +54,13 @@ static unsigned int hook_func (void *priv,
     
     struct iphdr *iph;
 	struct tcphdr *tph;
+
 	struct rohc_comp *compressor;
+
+	unsigned char rohc_buffer[BUFFER_SIZE];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
+
+	rohc_status_t status;
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
@@ -72,18 +80,28 @@ static unsigned int hook_func (void *priv,
 					ntohs(tph->dest));
 		
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-										gen_false_random_num, NULL);
+										gen_false_random_num, NULL);							
 			pr_info("Compressor is ready\n");
+
 			if (compressor == NULL) {
 				pr_info("failed\n");
 				return NF_DROP;
+			}
+
+			status = rohc_compress4(compressor, iph, &rohc_packet);
+			
+			if(status == ROHC_STATUS_OK) {
+				pr_info("ROHC Compression\n");
+			}
+			else {
+				pr_info("Compression failed\n");
+				return rohc_comp_free(compressor);
 			}
 			rohc_comp_free(compressor);
 		}
 		else
 			return NF_DROP;
 	}
-
     return NF_ACCEPT;
 }
 
