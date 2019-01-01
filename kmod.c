@@ -76,9 +76,9 @@ static unsigned int hook_func (void *priv,
 	}
 
 	pr_info("SRC=%pI4 DST=%pI4 \n", &ih->saddr, &ih->daddr);
-	
+
 	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
-			&ih->tot_len, &ih->tos, &ih->ttl, &ih->id, &ih->frag_off);
+			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
 
 	if (!skb)
 		return NF_ACCEPT;
