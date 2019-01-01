@@ -101,7 +101,7 @@ static unsigned int hook_func (void *priv,
 			}
 			rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
 
-			status = rohc_compress4(compressor, ip_buffer, &rohc_packet);
+			status = rohc_compress4(compressor, ip_packet, &rohc_packet);
 			
 			if (status == ROHC_STATUS_OK) {
 				pr_info("ROHC Compression\n");
