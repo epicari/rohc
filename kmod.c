@@ -54,7 +54,7 @@ static unsigned int hook_func (void *priv,
     
     struct iphdr *iph;
 	struct tcphdr *tph;
-	struct iphdr *ioffset;
+	const struct iphdr *ih;
 
 	struct rohc_comp *compressor;
 
@@ -68,8 +68,8 @@ static unsigned int hook_func (void *priv,
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
-	ioffset = iph - skb->data;
-
+	ih = skb_header_pointer(skb, iph->ip_off, iph->len, iph);
+	
     pr_info("Packet !\n");
 
 	if (!skb)
@@ -94,10 +94,7 @@ static unsigned int hook_func (void *priv,
 			}
 			rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
 
-			
-
-
-			status = rohc_compress4(compressor, ip_buffer, &rohc_packet);
+			//status = rohc_compress4(compressor, ip_buffer, &rohc_packet);
 			
 			if (status == ROHC_STATUS_OK) {
 				pr_info("ROHC Compression\n");
