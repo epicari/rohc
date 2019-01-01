@@ -68,7 +68,7 @@ static unsigned int hook_func (void *priv,
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
-	ih = skb_header_pointer(skb, iph->ip_off, iph->len, iph);
+	ih = skb_header_pointer(skb, iph->frag_off, iph->tot_len, iph);
 	
     pr_info("Packet !\n");
 
