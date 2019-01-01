@@ -68,7 +68,7 @@ static unsigned int hook_func (void *priv,
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, iph->tot_len, iph);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 	
 	if (ih == NULL) {
 		pr_info("TRUNCATED\n");
