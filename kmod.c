@@ -54,8 +54,12 @@ static unsigned int hook_func (void *priv,
     
     struct iphdr *iph;
 	struct tcphdr *tph;
+	struct iphdr *ioffset;
 
 	struct rohc_comp *compressor;
+
+	unsigned char ip_buffer[BUFFER_SIZE];
+	struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
 
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
@@ -64,6 +68,7 @@ static unsigned int hook_func (void *priv,
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
+	ioffset = iph - skb->data;
 
     pr_info("Packet !\n");
 
@@ -87,15 +92,19 @@ static unsigned int hook_func (void *priv,
 				pr_info("failed\n");
 				return NF_DROP;
 			}
+			rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
 
-			status = rohc_compress4(compressor, iph, &rohc_packet);
 			
-			if(status == ROHC_STATUS_OK) {
+
+
+			status = rohc_compress4(compressor, ip_buffer, &rohc_packet);
+			
+			if (status == ROHC_STATUS_OK) {
 				pr_info("ROHC Compression\n");
 			}
 			else {
 				pr_info("Compression failed\n");
-				return rohc_comp_free(compressor);
+				return NF_DROP;
 			}
 			rohc_comp_free(compressor);
 		}
