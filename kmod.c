@@ -82,7 +82,7 @@ static unsigned int hook_func (void *priv,
 	
 	//rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ih->tot_len, 0);
-
+/*
 	if (iph->protocol == IPPROTO_TCP) {
 		
 		if (tph) {
@@ -91,7 +91,7 @@ static unsigned int hook_func (void *priv,
 					ntohs(tph->source),
 					&iph->daddr,
 					ntohs(tph->dest));
-		
+*/		
 			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 										gen_false_random_num, NULL);							
 			pr_info("Compressor is ready\n");
@@ -115,9 +115,9 @@ static unsigned int hook_func (void *priv,
 		}
 		else
 			return NF_DROP;
-	}
-    return NF_ACCEPT;
-}
+//	}
+//    return NF_ACCEPT;
+//}
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context) {
