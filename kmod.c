@@ -83,7 +83,7 @@ static unsigned int hook_func (void *priv,
 	pr_info("Data=%u\n", skb->data);
 
 	//rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ih->tot_len, 0);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 /*
 	if (iph->protocol == IPPROTO_TCP) {
 		
