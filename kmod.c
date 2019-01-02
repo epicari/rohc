@@ -112,9 +112,11 @@ static unsigned int hook_func (void *priv,
 				return NF_DROP;
 			}
 			rohc_comp_free(compressor);
+
+			return NF_ACCEPT;
 		}
-		else
-			return NF_DROP;
+//		else
+//			return NF_DROP;
 //	}
 //    return NF_ACCEPT;
 //}
