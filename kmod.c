@@ -58,8 +58,8 @@ static unsigned int hook_func (void *priv,
 
 	struct rohc_comp *compressor;
 
-	unsigned char ip_buffer[BUFFER_SIZE];
-	struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
+	//unsigned char ip_buffer[BUFFER_SIZE];
+	//struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
 
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
@@ -80,7 +80,8 @@ static unsigned int hook_func (void *priv,
 	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
 			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
 	
-	rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
+	//rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ih->tot_len, 0);
 
 	if (iph->protocol == IPPROTO_TCP) {
 		
