@@ -80,6 +80,8 @@ static unsigned int hook_func (void *priv,
 	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
 			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
 	
+	pr_info("Data=%u\n", skb->data);
+
 	//rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ih->tot_len, 0);
 /*
