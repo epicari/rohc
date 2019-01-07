@@ -48,6 +48,21 @@ static struct nf_hook_ops nfho;
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
 
+
+static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
+			      const rohc_trace_level_t level,
+			      const rohc_trace_entity_t entity,
+			      const int profile,
+			      const char *const format,
+			      ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	vprintk(format, args);
+	va_end(args);
+}
+
 static unsigned int hook_func (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
@@ -57,9 +72,6 @@ static unsigned int hook_func (void *priv,
 	const struct iphdr *ih;
 
 	struct rohc_comp *compressor;
-
-	//unsigned char ip_buffer[BUFFER_SIZE];
-	//struct rohc_buf ip_packet = rohc_buf_init_empty(ip_buffer, BUFFER_SIZE);
 
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
@@ -74,54 +86,49 @@ static unsigned int hook_func (void *priv,
 		pr_info("TRUNCATED\n");
 		return NF_DROP;
 	}
-
+/*
 	pr_info("SRC=%pI4 DST=%pI4 \n", &ih->saddr, &ih->daddr);
 
 	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
 			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
 	
 	pr_info("Data=%u\n", skb->data);
+*/
 
-	//rohc_buf_prepend(ip_packet, skb->data, ntohs(ih->tot_len));
+	memset(compressor, 0, sizeof(struct rohc_comp));
+
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
-/*
-	if (iph->protocol == IPPROTO_TCP) {
-		
-		if (tph) {
-			pr_info("SRC: (%pI4):%d --> DST: (%pI4):%d\n",
-					&iph->saddr,
-					ntohs(tph->source),
-					&iph->daddr,
-					ntohs(tph->dest));
-*/		
-			compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-										gen_false_random_num, NULL);							
-			pr_info("Compressor is ready\n");
+	
+	compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+								gen_false_random_num, NULL);	
 
-			if (compressor == NULL) {
-				pr_info("failed\n");
-				return NF_DROP;
-			}
-			rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
+	pr_info("Compressor is ready\n");
 
-			status = rohc_compress4(compressor, ip_packet, &rohc_packet);
+	if (compressor == NULL) {
+		pr_info("failed\n");
+		return NF_DROP;
+	}
+
+	rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL);
+	pr_info("\t trace callback\n");
+
+	rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS);
+
+	rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
+
+	status = rohc_compress4(compressor, ip_packet, &rohc_packet);
 			
-			if (status == ROHC_STATUS_OK) {
-				pr_info("ROHC Compression\n");
-			}
-			else {
-				pr_info("Compression failed\n");
-				return NF_DROP;
-			}
-			rohc_comp_free(compressor);
+	if (status == ROHC_STATUS_OK) {
+		pr_info("ROHC Compression\n");
+	}
+	else {
+		pr_info("Compression failed\n");
+		return NF_DROP;
+	}
+	rohc_comp_free(compressor);
 
-			return NF_ACCEPT;
-		}
-//		else
-//			return NF_DROP;
-//	}
-//    return NF_ACCEPT;
-//}
+	return NF_ACCEPT;
+	}
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context) {
@@ -130,7 +137,7 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 
 static int my_init(void) {
     nfho.hook = hook_func;
-    nfho.hooknum = NF_INET_LOCAL_IN;
+    nfho.hooknum = NF_INET_LOCAL_OUT;
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_CONNTRACK_CONFIRM - 1;
 	nfho.priv = NULL;
