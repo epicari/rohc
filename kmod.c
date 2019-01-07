@@ -45,6 +45,8 @@
 
 static struct nf_hook_ops nfho;
 
+static struct rohc_comp *compressor;
+
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
 
@@ -70,8 +72,6 @@ static unsigned int hook_func (void *priv,
     struct iphdr *iph;
 	struct tcphdr *tph;
 	const struct iphdr *ih;
-
-	struct rohc_comp *compressor;
 
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
