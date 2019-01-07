@@ -91,19 +91,25 @@ static unsigned int hook_func (void *priv,
 	compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 								gen_false_random_num, NULL);	
 
-	pr_info("Compressor is ready\n");
-
 	if (compressor == NULL) {
-		pr_info("failed\n");
+		pr_info("failed create the ROHC compressor\n");
 		return NF_DROP;
 	}
 
-	rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL);
-	pr_info("\t trace callback\n");
+	if(!rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL)) {
+		pr_info("cannot set trace callback for compressor\n");
+		goto free_compressor;
+	}
 
-	rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS);
+	if(!rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
+		pr_info("failed to enable packet dumps\n");
+		goto free_compressor;
+	}
 
-	rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP);
+	if(!rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP)) {
+		pr_info("failed to enable the profile\n");
+		goto free_compressor;
+	}
 
 	status = rohc_compress4(compressor, ip_packet, &rohc_packet);
 			
@@ -112,11 +118,13 @@ static unsigned int hook_func (void *priv,
 	}
 	else {
 		pr_info("Compression failed\n");
-		return NF_DROP;
+		goto free_compressor;
 	}
-	rohc_comp_free(compressor);
 
 	return NF_ACCEPT;
+
+free_compressor:
+	rohc_comp_free(compressor);
 	}
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
