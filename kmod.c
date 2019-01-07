@@ -47,6 +47,9 @@ static struct nf_hook_ops nfho;
 
 static struct rohc_comp *compressor;
 
+static struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
+
+
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
 
@@ -74,7 +77,6 @@ static unsigned int hook_func (void *priv,
 	const struct iphdr *ih;
 
 	unsigned char rohc_buffer[BUFFER_SIZE];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
 
 	rohc_status_t status;
 
@@ -95,7 +97,7 @@ static unsigned int hook_func (void *priv,
 	pr_info("Data=%u\n", skb->data);
 */
 
-	memset(compressor, 0, sizeof(struct rohc_comp));
+	memset(compressor, 0, sizeof(struct &rohc_comp));
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	
