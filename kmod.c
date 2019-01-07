@@ -79,6 +79,7 @@ static unsigned int hook_func (void *priv,
 		return NF_DROP;
 	}
 
+
 	struct rohc_comp *compressor;
 	unsigned char rohc_buffer[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
