@@ -95,12 +95,12 @@ static unsigned int hook_func (void *priv,
 		pr_info("failed create the ROHC compressor\n");
 		return NF_DROP;
 	}
-/*
+
 	if(!rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_compressor;
 	}
-*/
+
 	if(!rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_compressor;
@@ -134,7 +134,8 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 
 static int my_init(void) {
     nfho.hook = hook_func;
-    nfho.hooknum = NF_INET_POST_ROUTING;
+    //nfho.hooknum = NF_INET_POST_ROUTING;
+	nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_CONNTRACK_CONFIRM - 1;
 	nfho.priv = NULL;
