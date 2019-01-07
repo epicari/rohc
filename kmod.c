@@ -45,14 +45,8 @@
 
 static struct nf_hook_ops nfho;
 
-static struct rohc_comp *compressor;
-
-static struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
-
-
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
-
 
 static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 			      const rohc_trace_level_t level,
@@ -76,10 +70,6 @@ static unsigned int hook_func (void *priv,
 	struct tcphdr *tph;
 	const struct iphdr *ih;
 
-	unsigned char rohc_buffer[BUFFER_SIZE];
-
-	rohc_status_t status;
-
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
@@ -88,19 +78,15 @@ static unsigned int hook_func (void *priv,
 		pr_info("TRUNCATED\n");
 		return NF_DROP;
 	}
-/*
-	pr_info("SRC=%pI4 DST=%pI4 \n", &ih->saddr, &ih->daddr);
 
-	pr_info("LEN=%u TOS=%u TTL=%u ID=%u OFFSET=%u \n", 
-			ntohs(ih->tot_len), ih->tos, ih->ttl, ntohs(ih->id), ih->frag_off);
-	
-	pr_info("Data=%u\n", skb->data);
-*/
-
-	memset(compressor, 0, sizeof(struct &rohc_comp));
-
+	struct rohc_comp *compressor;
+	unsigned char rohc_buffer[BUFFER_SIZE];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
-	
+	rohc_status_t status;
+
+	memset(compressor, 0, sizeof(compressor));
+
 	compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 								gen_false_random_num, NULL);	
 
