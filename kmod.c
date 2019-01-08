@@ -41,7 +41,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 10000
 
 static struct nf_hook_ops nfho;
 
@@ -82,8 +82,8 @@ static unsigned int hook_func (void *priv,
 	}
 
 	struct rohc_comp *compressor;
-	unsigned char rohc_buffer[BUFFER_SIZE];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buffer, BUFFER_SIZE);
+	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	rohc_status_t status;
 
@@ -101,12 +101,12 @@ static unsigned int hook_func (void *priv,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_compressor;
 	}
-/*
+
 	if(!rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_compressor;
 	}
-*/
+
 	if(!rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP)) {
 		pr_info("failed to enable the profile\n");
 		goto free_compressor;
