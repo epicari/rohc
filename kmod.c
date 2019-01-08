@@ -96,7 +96,7 @@ static unsigned int hook_func (void *priv,
 		pr_info("failed create the ROHC compressor\n");
 		return NF_DROP;
 	}
-
+/*
 	if(!rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_compressor;
@@ -106,7 +106,7 @@ static unsigned int hook_func (void *priv,
 		pr_info("failed to enable packet dumps\n");
 		goto free_compressor;
 	}
-
+*/
 	if(!rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP)) {
 		pr_info("failed to enable the profile\n");
 		goto free_compressor;
