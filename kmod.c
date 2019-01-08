@@ -74,11 +74,12 @@ static unsigned int hook_func (void *priv,
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 	
+	pr_info("Start\n");
+
 	if (ih == NULL) {
 		pr_info("TRUNCATED\n");
 		return NF_DROP;
 	}
-
 
 	struct rohc_comp *compressor;
 	unsigned char rohc_buffer[BUFFER_SIZE];
