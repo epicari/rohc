@@ -1,0 +1,1 @@
+cmd_/home/rohc/git/rohc/hello_func_test.ko := ld -r -m elf_x86_64 -z max-page-size=0x200000 -T ./scripts/module-common.lds --build-id  -o /home/rohc/git/rohc/hello_func_test.ko /home/rohc/git/rohc/hello_func_test.o /home/rohc/git/rohc/hello_func_test.mod.o ;  true
