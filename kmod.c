@@ -41,7 +41,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 1024
 
 static struct nf_hook_ops nfho;
 
