@@ -82,7 +82,8 @@ static unsigned int hook_func (void *priv,
 	}
 
 	struct rohc_comp *compressor;
-	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	//unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	unsigned char rohc_packet_out[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	rohc_status_t status;
