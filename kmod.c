@@ -122,10 +122,11 @@ static unsigned int hook_func (void *priv,
 		goto free_compressor;
 	}
 
-	return NF_ACCEPT;
-
 free_compressor:
 	rohc_comp_free(compressor);
+
+	return NF_ACCEPT;
+
 	}
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
