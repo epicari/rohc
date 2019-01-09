@@ -93,6 +93,8 @@ static unsigned int hook_func (void *priv,
 	uint16_t ip_chunk_size = sizeof(skb->data);
 	uint16_t ip_tot_len = sizeof(ntohs(ih->tot_len));
 
+	memset(decompressor, 0, sizeof(decompressor));
+
 	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 								ROHC_O_MODE);	
 
