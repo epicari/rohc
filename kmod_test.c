@@ -124,7 +124,7 @@ static unsigned int hook_func (void *priv,
 	feedback_to_send.time.sec = 0;
 	feedback_to_send.time.nsec = 0;
 	feedback_to_send.data = feedback_to_send_buffer;
-	feedback_to_send.max_len = MAX_ROHC_SIZE;
+	feedback_to_send.max_len = BUFFER_SIZE;
 	feedback_to_send.offset = 0;
 	feedback_to_send.len = 0;
 
