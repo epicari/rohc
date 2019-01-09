@@ -86,10 +86,6 @@ static unsigned int hook_comp (void *priv,
 	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	unsigned char ip_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
-	unsigned char rcvd_feedback_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	unsigned char feedback_to_send_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-
-	struct rohc_buf feedback_to_send;
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	

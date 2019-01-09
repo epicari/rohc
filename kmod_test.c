@@ -41,7 +41,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 2048
+#define DE_BUFFER_SIZE 2048
 
 static struct nf_hook_ops nfho;
 
@@ -79,15 +79,15 @@ static unsigned int hook_decomp (void *priv,
 	}
 
 	struct rohc_decomp *decompressor;
-	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	unsigned char ip_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	unsigned char de_rohc_packet_out = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
+	unsigned char de_ip_packet_out = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
 
-	unsigned char rcvd_feedback_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	unsigned char feedback_to_send_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	unsigned char rcvd_feedback_buffer = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
+	unsigned char feedback_to_send_buffer = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
 
 	struct rohc_buf feedback_to_send;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	struct rohc_buf de_rohc_packet = rohc_buf_init_empty(de_rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf de_ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	rohc_status_t status;
 
 	uint16_t ip_chunk_size = sizeof(skb->data);
@@ -119,7 +119,7 @@ static unsigned int hook_decomp (void *priv,
 		return NF_DROP;
 	}
 
-	status = rohc_decompress3(decompressor, ip_packet, &rohc_packet, 
+	status = rohc_decompress3(decompressor, de_ip_packet, &de_rohc_packet, 
 							rcvd_feedback_buffer, feedback_to_send_buffer);
 
 	if(status == ROHC_STATUS_OK) {
@@ -137,8 +137,8 @@ static unsigned int hook_decomp (void *priv,
 	
 	return NF_ACCEPT;
 
-	kfree(rohc_packet_out);
-	kfree(ip_packet_out);
+	kfree(de_rohc_packet_out);
+	kfree(de_ip_packet_out);
 	kfree(rcvd_feedback_buffer);
 	kfree(feedback_to_send_buffer);
 
