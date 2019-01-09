@@ -93,10 +93,8 @@ static unsigned int hook_func (void *priv,
 	uint16_t ip_chunk_size = sizeof(skb->data);
 	uint16_t ip_tot_len = sizeof(ntohs(ih->tot_len));
 
-	memset(decompressor, 0, sizeof(decompressor));
-
 	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-								ROHC_O_MODE);	
+								ROHC_U_MODE);	
 
 	if (decompressor == NULL) {
 		pr_info("failed create the ROHC decompressor\n");
@@ -121,13 +119,6 @@ static unsigned int hook_func (void *priv,
 		return NF_DROP;
 	}
 
-	feedback_to_send.time.sec = 0;
-	feedback_to_send.time.nsec = 0;
-	feedback_to_send.data = feedback_to_send_buffer;
-	feedback_to_send.max_len = BUFFER_SIZE;
-	feedback_to_send.offset = 0;
-	feedback_to_send.len = 0;
-
 	status = rohc_decompress3(decompressor, ip_packet, &rohc_packet, 
 							rcvd_feedback_buffer, feedback_to_send_buffer);
 
@@ -143,7 +134,6 @@ static unsigned int hook_func (void *priv,
 		pr_info("Decompressor failed\n");
 		return NF_DROP;
 	}
-
 	
 	return NF_ACCEPT;
 
@@ -154,7 +144,7 @@ static unsigned int hook_func (void *priv,
 
 	}
 
-static int my_init(void) {
+static int my_decomp(void) {
     nfho.hook = hook_func;
     nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
     nfho.pf = NFPROTO_IPV4;
@@ -166,12 +156,12 @@ static int my_init(void) {
     return 0;
 }
 
-static void my_exit(void) {
+static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
-module_init(my_init);
-module_exit(my_exit);
+module_init(my_decomp);
+module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
