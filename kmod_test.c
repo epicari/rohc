@@ -95,8 +95,8 @@ static unsigned int hook_func (void *priv,
 
 	memset(decompressor, 0, sizeof(decompressor));
 
-	decompressor = rohc_decomp_new2(ROHC_LARGE_CID, 4, 
-								ROHC_U_MODE);	
+	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+								ROHC_O_MODE);	
 
 	if (decompressor == NULL) {
 		pr_info("failed create the ROHC decompressor\n");
@@ -108,7 +108,7 @@ static unsigned int hook_func (void *priv,
 		return NF_DROP;
 	}
 
-	if(!rohc_comp_set_features(decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
+	if(!rohc_decomp_set_features(decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		return NF_DROP;
 	}

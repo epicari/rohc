@@ -128,44 +128,6 @@ static unsigned int hook_func (void *priv,
 		return NF_DROP;
 	}
 
-	/* Decompressor */
-
-
-	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-									ROHC_O_MODE, NULL);		
-
-	if (decompressor == NULL) {
-		pr_info("failed create the ROHC decompressor\n");
-		return NF_DROP;
-	}
-
-	if(!rohc_decomp_set_traces_cb2(decompressor, rohc_print_traces, NULL)) {
-		pr_info("cannot set trace callback for decompressor\n");
-		return NF_DROP;
-	}
-
-	if(!rohc_comp_set_features(decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
-		pr_info("failed to enable packet dumps\n");
-		return NF_DROP;
-	}
-
-	if(!rohc_decomp_enable_profiles(decompressor,
-						ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
-						ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
-						ROHC_PROFILE_TCP, ROHC_PROFILE_UDPLITE, -1)) {
-		pr_info("failed to enable the profile\n");
-		return NF_DROP;
-	}
-
-	feedback_to_send.time.sec = 0;
-	feedback_to_send.time.nsec = 0;
-	feedback_to_send.data = feedback_to_send_buffer;
-	feedback_to_send.max_len = BUFFER_SIZE;
-	feedback_to_send.offset = 0;
-	feedback_to_send.len = 0;
-
-	/* release */
-
 	status = rohc_compress4(compressor, ip_packet, &rohc_packet);
 			
 	if (status == ROHC_STATUS_OK) {
