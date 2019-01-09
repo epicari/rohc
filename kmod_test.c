@@ -144,7 +144,7 @@ static unsigned int hook_decomp (void *priv,
 
 	}
 
-static int my_decomp(void) {
+int __init my_decomp(void) {
     nfho.hook = hook_decomp;
     nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
     nfho.pf = NFPROTO_IPV4;
@@ -156,7 +156,7 @@ static int my_decomp(void) {
     return 0;
 }
 
-static void my_decomp_exit(void) {
+void __exit my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
