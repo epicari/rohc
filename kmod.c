@@ -62,7 +62,7 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
-static unsigned int hook_func (void *priv,
+static unsigned int hook_comp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
     
@@ -155,7 +155,7 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 }
 
 static int my_comp(void) {
-    nfho.hook = hook_func;
+    nfho.hook = hook_comp;
     nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
