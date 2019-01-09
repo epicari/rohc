@@ -36,6 +36,9 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
+#include <linux/uaccess.h>
+#include <linux/proc_fs.h>
+
 #include "config.h"
 #include "rohc.h"
 #include "rohc_comp.h"
