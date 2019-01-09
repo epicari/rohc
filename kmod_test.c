@@ -41,7 +41,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define DE_BUFFER_SIZE 2048
+#define BUFFER_SIZE 2048
 
 static struct nf_hook_ops nfho;
 
@@ -79,11 +79,11 @@ static unsigned int hook_decomp (void *priv,
 	}
 
 	struct rohc_decomp *decompressor;
-	unsigned char de_rohc_packet_out = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
-	unsigned char de_ip_packet_out = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
+	unsigned char de_rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	unsigned char de_ip_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
-	unsigned char rcvd_feedback_buffer = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
-	unsigned char feedback_to_send_buffer = kmalloc(DE_BUFFER_SIZE, GFP_KERNEL);
+	unsigned char rcvd_feedback_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	unsigned char feedback_to_send_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	struct rohc_buf feedback_to_send;
 	struct rohc_buf de_rohc_packet = rohc_buf_init_empty(de_rohc_packet_out, BUFFER_SIZE);
