@@ -170,15 +170,21 @@ static unsigned int hook_func (void *priv,
 			
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
+		pr_info("LEN=%u TTL=%u ID=%u DATA=%u",
+				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 	}
 	else {
 		pr_info("Compression failed\n");
 		return NF_DROP;
 	}
 
-	rohc_comp_free(compressor);
-
 	return NF_ACCEPT;
+
+	rohc_comp_free(compressor);
+	kfree(rohc_packet_out);
+	kfree(ip_packet_out);
+	kfree(rcvd_feedback_buffer);
+	kfree(feedback_to_send_buffer);
 
 	}
 

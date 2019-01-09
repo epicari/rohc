@@ -126,8 +126,29 @@ static unsigned int hook_func (void *priv,
 	feedback_to_send.offset = 0;
 	feedback_to_send.len = 0;
 
-	pr_info("Decompressor OK\n");
+	status = rohc_decompress3(decompressor, ip_packet, &rohc_packet, 
+							rcvd_feedback_buffer, feedback_to_send_buffer);
+
+	if(status == ROHC_STATUS_OK) {
+
+		if(!rohc_buf_is_empty(rohc_packet)) {
+			pr_info("Decompressor OK\n");
+			pr_info("LEN=%u TTL=%u ID=%u DATA=%u",
+					ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+	}
+
+	else {
+		pr_info("Decompressor failed\n");
+		return NF_DROP;
+	}
+
+	
 	return NF_ACCEPT;
+
+	kfree(rohc_packet_out);
+	kfree(ip_packet_out);
+	kfree(rcvd_feedback_buffer);
+	kfree(feedback_to_send_buffer);
 
 	}
 
