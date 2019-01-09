@@ -137,9 +137,8 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 static int my_init(void) {
     nfho.hook = hook_func;
     nfho.hooknum = NF_INET_POST_ROUTING;
-	//nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_CONNTRACK_CONFIRM - 1;
+    nfho.priority = NF_IP_PRI_FIRST;
 	nfho.priv = NULL;
 
     nf_register_net_hook(&init_net, &nfho);
