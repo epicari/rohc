@@ -124,7 +124,7 @@ static unsigned int hook_decomp (void *priv,
 
 	if(status == ROHC_STATUS_OK) {
 
-		if(!rohc_buf_is_empty(rohc_packet)) {
+		if(!rohc_buf_is_empty(de_rohc_packet)) {
 			pr_info("Decompressor OK\n");
 			pr_info("LEN=%u TTL=%u ID=%u DATA=%u",
 					ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
