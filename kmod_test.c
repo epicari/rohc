@@ -144,7 +144,7 @@ static unsigned int hook_decomp (void *priv,
 
 	}
 
-int __init my_decomp(void) {
+int __init rohc_test_init(void) {
     nfho.hook = hook_decomp;
     nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
     nfho.pf = NFPROTO_IPV4;
@@ -156,12 +156,12 @@ int __init my_decomp(void) {
     return 0;
 }
 
-void __exit my_decomp_exit(void) {
+void __exit rohc_test_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
-module_init(my_decomp);
-module_exit(my_decomp_exit);
+module_init(rohc_test_init);
+module_exit(rohc_test_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
