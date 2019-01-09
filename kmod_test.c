@@ -95,7 +95,7 @@ static unsigned int hook_func (void *priv,
 
 	memset(decompressor, 0, sizeof(decompressor));
 
-	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+	decompressor = rohc_decomp_new2(ROHC_LARGE_CID, 4, 
 								ROHC_U_MODE);	
 
 	if (decompressor == NULL) {
