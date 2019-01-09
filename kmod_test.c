@@ -78,7 +78,7 @@ static unsigned int hook_func (void *priv,
 		return NF_DROP;
 	}
 
-	struct rohc_comp *decompressor;
+	struct rohc_decomp *decompressor;
 	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	unsigned char ip_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
@@ -94,7 +94,7 @@ static unsigned int hook_func (void *priv,
 	uint16_t ip_tot_len = sizeof(ntohs(ih->tot_len));
 
 	decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-								ROHC_U_MODE);	
+								ROHC_U_MODE);
 
 	if (decompressor == NULL) {
 		pr_info("failed create the ROHC decompressor\n");
