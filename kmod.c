@@ -82,8 +82,8 @@ static unsigned int hook_func (void *priv,
 	}
 
 	struct rohc_comp *compressor;
-	//unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	unsigned char rohc_packet_out[BUFFER_SIZE];
+	unsigned char rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	//unsigned char rohc_packet_out[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	rohc_status_t status;
@@ -97,20 +97,20 @@ static unsigned int hook_func (void *priv,
 		pr_info("failed create the ROHC compressor\n");
 		return NF_DROP;
 	}
-/*
+
 	if(!rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
-		goto free_compressor;
+		return NF_DROP;
 	}
 
 	if(!rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
-		goto free_compressor;
+		return NF_DROP;
 	}
-*/
+
 	if(!rohc_comp_enable_profile(compressor, ROHC_PROFILE_IP)) {
 		pr_info("failed to enable the profile\n");
-		goto free_compressor;
+		return NF_DROP;
 	}
 
 	status = rohc_compress4(compressor, ip_packet, &rohc_packet);
@@ -120,10 +120,9 @@ static unsigned int hook_func (void *priv,
 	}
 	else {
 		pr_info("Compression failed\n");
-		goto free_compressor;
+		return NF_DROP;
 	}
 
-free_compressor:
 	rohc_comp_free(compressor);
 
 	return NF_ACCEPT;
