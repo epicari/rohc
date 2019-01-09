@@ -140,8 +140,6 @@ static unsigned int hook_comp (void *priv,
 	rohc_comp_free(compressor);
 	kfree(rohc_packet_out);
 	kfree(ip_packet_out);
-	kfree(rcvd_feedback_buffer);
-	kfree(feedback_to_send_buffer);
 
 	}
 
