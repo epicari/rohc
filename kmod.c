@@ -76,7 +76,7 @@ static unsigned int hook_comp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 	
 	pr_info("Start\n");
-	pr_info("LEN=%u TTL=%u ID=%u DATA=%u",
+	pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
 			ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 
 	if (ih == NULL) {
@@ -132,7 +132,7 @@ static unsigned int hook_comp (void *priv,
 				
 		if (status == ROHC_STATUS_OK) {
 			pr_info("ROHC Compression\n");
-			pr_info("LEN=%u TTL=%u ID=%u DATA=%u",
+			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
 					ip_tot_len, ih->ttl, ntohs(ih->id), skb->data);
 		}
 		else {
