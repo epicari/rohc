@@ -86,6 +86,8 @@ static unsigned int hook_comp (void *priv,
 
 	if (iph->protocol == IPPROTO_TCP) {
 
+		pr_info("ROHC Compressor ON\n");
+
 		struct rohc_comp *compressor;
 
 		unsigned char *rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -100,10 +102,9 @@ static unsigned int hook_comp (void *priv,
 		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 		
 		rohc_status_t status;
-		uint16_t ip_chunk_size = sizeof(skb->data);
-		uint16_t ip_tot_len = sizeof(ntohs(ih->tot_len));
+		size_t i;
 
-		memset(compressor, 0, sizeof(compressor));
+		//memset(compressor, 0, sizeof(compressor));
 
 		compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
@@ -133,7 +134,11 @@ static unsigned int hook_comp (void *priv,
 		if (status == ROHC_STATUS_OK) {
 			pr_info("ROHC Compression\n");
 			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
-					ip_tot_len, ih->ttl, ntohs(ih->id), skb->data);
+				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+			
+			for (i = 0; i < rohc_packet.len; i++) {
+				pr_info(rohc_buf_byte_at(rohc_packet, i));
+			}
 		}
 		else {
 			pr_info("Compression failed\n");
