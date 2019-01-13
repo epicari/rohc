@@ -135,10 +135,11 @@ static unsigned int hook_comp (void *priv,
 			pr_info("ROHC Compression\n");
 			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
 				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-			
+/*			
 			for (i = 0; i < rohc_packet.len; i++) {
 				pr_info(rohc_buf_byte_at(rohc_packet, i));
 			}
+*/
 		}
 		else {
 			pr_info("Compression failed\n");
