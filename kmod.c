@@ -87,12 +87,10 @@ static unsigned int hook_comp (void *priv,
 
 		pr_info("ROHC Compressor ON\n");
 
-		struct rohc_comp *compressor;
+		struct rohc_comp *compressor = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 		unsigned char *rohc_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-		unsigned char *ip_packet_out = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-
-		unsigned char *rcvd_feedback_buf = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+		unsigned char *ip_packet_in = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 		unsigned char *feedback_to_send_buf = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 		struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
@@ -101,9 +99,8 @@ static unsigned int hook_comp (void *priv,
 		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
 		
 		rohc_status_t status;
-		size_t i;
 
-		//memset(compressor, 0, sizeof(compressor));
+		memset(compressor, 0, BUFFER_SIZE);
 
 		compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
@@ -140,11 +137,13 @@ static unsigned int hook_comp (void *priv,
 			return NF_DROP;
 		}
 
-		return NF_ACCEPT;
-
 		rohc_comp_free(compressor);
+		kfree(compressor);
 		kfree(rohc_packet_out);
-		kfree(ip_packet_out);
+		kfree(ip_packet_in);
+		kfree(feedback_to_send_buf);
+
+		return NF_ACCEPT;
 
 	}
 }
