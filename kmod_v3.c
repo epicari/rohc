@@ -146,7 +146,7 @@ int rohc_decomp_init(struct rohc_init *decomp) {
 		goto free_decomp;
 	}
 
-	decomp->rohc_pkt_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	decomp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	
 	decomp->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
