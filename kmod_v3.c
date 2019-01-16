@@ -87,7 +87,9 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	pr_info("ROHC_COMP_INIT\n");
 
+	comp = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	comp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
 	if(comp->rohc_packet_out == NULL)
 		goto free_comp;
 
@@ -96,8 +98,6 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	rohc_status_t status;
 	size_t i;
-
-	comp = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	comp->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
@@ -125,33 +125,51 @@ int rohc_comp_init(struct rohc_init *comp,
 	status = rohc_compress4(comp->compressor, ip_packet, &rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
-		pr_info("ROHC Compression\n");
+		pr_info("ROHC compression\n");
 	}
 	else {
 		pr_info("Compression failed\n");
 		goto free_comp;
 	}
 
-	free(comp);
-
 	return 0;
 
 free_comp:
 	rohc_comp_free(comp->compressor);
-	return NF_DROP;
+	return NF_ACCEPT;
 }
 
-int rohc_decomp_init(struct rohc_init *decomp) {
+int rohc_decomp_init(struct rohc_init *decomp,
+				struct sk_buff *skb,
+				struct iphdr *ih) {
 
 	pr_info("ROHC_DECOMP_INIT\n");
+
 	decomp = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	decomp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(decomp->rohc_packet_out == NULL)
+		goto free_decomp;
+
+	decomp->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(decomp->rcvd_feedback_buf == NULL)
+		return NF_ACCEPT;
+
+	decomp->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(decomp->feedback_to_send_buf == NULL)
+		return NF_ACCEPT;
+
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(decomp->rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+
+	rohc_status_t status;
+	size_t i;
 
 	decomp->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 											ROHC_O_MODE);
 
 	if (decomp->decompressor == NULL) {
 		pr_info("failed create the ROHC compressor\n");
-		goto free_decomp;
+		goto free_comp;
 	}
 /*
 	if(!rohc_decomp_set_traces_cb2(decomp->decompressor, rohc_print_traces, NULL)) {
@@ -168,24 +186,29 @@ int rohc_decomp_init(struct rohc_init *decomp) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_decomp;
 	}
-/*
-	decomp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	
-	decomp->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
-	decomp->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	status = rohc_decompress3(decomp->decompressor, rohc_packet, &ip_packet, 
+							rcvd_feedback_buf, feedback_to_send_buf);
 
-	kfree(decomp);
-	kfree(rohc_packet_out);
-	kfree(rcvd_feedback_buf);
-	kfree(feedback_to_send_buf);
-*/
-	kfree(decomp);
+	if(status == ROHC_STATUS_OK) {
+		if(!rohc_buf_is_empty(ip_packet)) {
+			pr_info("IP packet is empty\n");
+		}
+		pr_info("ROHC decompression\n");
+		else {
+			pr_info("ROHC decomp failed\n");
+			goto free_decomp;
+		}
+	}
+
 	return 0;
 
 free_decomp:
 	rohc_decomp_free(decomp->decompressor);
-	return NF_DROP;
+	return NF_ACCEPT;
+free_comp:
+	rohc_comp_free(comp->compressor);
+	return NF_ACCEPT;
 }
 
 static unsigned int hook_init (void *priv,
@@ -216,38 +239,14 @@ static unsigned int hook_init (void *priv,
 		i = rohc_comp_init(&rinit, skb, ih);
 		if (i != 0) {
 			pr_info("failed to init ROHC Compressor\n");
-			return NF_DROP;
+			return NF_ACCEPT;
 		}
 
 		i = rohc_decomp_init(&rinit);
 		if (i != 0) {
 			pr_info("failed to init ROHC Decompressor\n");
-			return NF_DROP;
+			return NF_ACCEPT;
 		}
-/*
-		unsigned char *rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-		//unsigned char *ip_packet_in = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-		unsigned char *feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
-		struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
-
-		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		
-		rohc_status_t status;
-
-		status = rohc_compress4(comp->compressor, ip_packet, &rohc_packet);
-				
-		if (status == ROHC_STATUS_OK) {
-			pr_info("ROHC Compression\n");
-			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
-					ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-		}
-		else {
-			pr_info("Compression failed\n");
-			goto free_comp;
-		}
-*/
 
 		return NF_ACCEPT;
 	}
