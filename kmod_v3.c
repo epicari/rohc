@@ -87,6 +87,10 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	pr_info("ROHC_COMP_INIT\n");
 
+	comp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(comp->rohc_packet_out == NULL)
+		goto free_comp;
+
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(comp->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 
