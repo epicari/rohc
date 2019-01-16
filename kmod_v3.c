@@ -194,14 +194,17 @@ int rohc_decomp_init(struct rohc_init *decomp,
 							rcvd_feedback, feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
+	
 		if(!rohc_buf_is_empty(ip_packet)) {
 			pr_info("IP packet is empty\n");
 		}
+
 		pr_info("ROHC decompression\n");
-		else {
-			pr_info("ROHC decomp failed\n");
-			goto free_decomp;
-		}
+	}
+
+	else {
+		pr_info("ROHC decomp failed\n");
+		goto free_decomp;
 	}
 
 	return 0;
