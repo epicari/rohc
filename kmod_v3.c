@@ -126,6 +126,8 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC compression\n");
+		pr_info("ROHC LEN=%u TTL=%u ID=%u DATA=%u",
+		ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 	}
 	else {
 		pr_info("Compression failed\n");
