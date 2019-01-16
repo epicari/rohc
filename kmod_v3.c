@@ -182,11 +182,12 @@ static unsigned int hook_init (void *priv,
 		return NF_DROP;
 	}
 
-	pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
-			ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-
 	if (iph->protocol == IPPROTO_TCP) {
 		int i;
+
+		
+		pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
+				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 
 		pr_info("ROHC COMP / DECOMP INIT Start\n");
 	
@@ -237,7 +238,8 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 
 static int my_comp(void) {
     nfho.hook = hook_init;
-    nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+    //nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
 	nfho.priv = NULL;
