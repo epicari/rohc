@@ -242,7 +242,7 @@ static unsigned int hook_init (void *priv,
 			return NF_ACCEPT;
 		}
 
-		i = rohc_decomp_init(&rinit);
+		i = rohc_decomp_init(&rinit, skb, ih);
 		if (i != 0) {
 			pr_info("failed to init ROHC Decompressor\n");
 			return NF_ACCEPT;
