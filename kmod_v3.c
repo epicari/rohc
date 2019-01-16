@@ -81,9 +81,17 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 }
 
 
-int rohc_comp_init(struct rohc_init *comp) {
+int rohc_comp_init(struct rohc_init *comp,
+				struct sk_buff *skb,
+				struct iphdr *ih) {
 
 	pr_info("ROHC_COMP_INIT\n");
+
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(comp->rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+
+	rohc_status_t status;
+
 	comp = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	comp->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
@@ -106,6 +114,18 @@ int rohc_comp_init(struct rohc_init *comp) {
 */
 	if(!rohc_comp_enable_profile(comp->compressor, ROHC_PROFILE_TCP)) {
 		pr_info("failed to enable the TCP profile\n");
+		goto free_comp;
+	}
+
+	status = rohc_compress4(comp->compressor, ip_packet, &rohc_packet);
+
+	if (status == ROHC_STATUS_OK) {
+		pr_info("ROHC Compression\n");
+		pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
+				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+	}
+	else {
+		pr_info("Compression failed\n");
 		goto free_comp;
 	}
 
@@ -171,7 +191,7 @@ static unsigned int hook_init (void *priv,
     
     struct iphdr *iph;
 	struct tcphdr *tph;
-	const struct iphdr *ih;
+	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
@@ -190,7 +210,7 @@ static unsigned int hook_init (void *priv,
 
 		pr_info("ROHC COMP / DECOMP INIT Start\n");
 	
-		i = rohc_comp_init(&rinit);
+		i = rohc_comp_init(&rinit, skb, ih);
 		if (i != 0) {
 			pr_info("failed to init ROHC Compressor\n");
 			return NF_DROP;
