@@ -95,6 +95,7 @@ int rohc_comp_init(struct rohc_init *comp,
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 
 	rohc_status_t status;
+	size_t i;
 
 	comp = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
@@ -125,8 +126,11 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
-		pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
-				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+		
+		for(i = 0; i < rohc_packet.len; i++) {
+			pr_info("Compress Header: 0x%02x ", 
+					rohc_buf_byte_at(rohc_packet, i));
+		}
 	}
 	else {
 		pr_info("Compression failed\n");
