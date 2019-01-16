@@ -179,7 +179,7 @@ static unsigned int hook_init (void *priv,
 
 	if (ih == NULL) {
 		pr_info("TRUNCATED\n");
-		return NF_DROP;
+		return NF_ACCEPT;
 	}
 
 	if (iph->protocol == IPPROTO_TCP) {
