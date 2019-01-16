@@ -43,7 +43,7 @@
 #include "rohc_decomp.h"
 
 #include <linux/socket.h>
-#include <linux/arpa/inet.h>
+#include <linux/inet.h>
 #include <linux/in.h>
 
 #define BUFFER_SIZE 2048
