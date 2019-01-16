@@ -160,6 +160,9 @@ int rohc_decomp_init(struct rohc_init *decomp,
 
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(decomp->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(decomp->rcvd_feedback_buf, 
+														BUFFER_SIZE);
+	struct rohc_buf *feedback_to_send = NULL;
 
 	rohc_status_t status;
 	size_t i;
@@ -188,7 +191,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 	}
 
 	status = rohc_decompress3(decomp->decompressor, rohc_packet, &ip_packet, 
-					decomp->rcvd_feedback_buf, decomp->feedback_to_send_buf);
+							rcvd_feedback, feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
 		if(!rohc_buf_is_empty(ip_packet)) {
