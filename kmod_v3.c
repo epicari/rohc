@@ -173,19 +173,18 @@ static unsigned int hook_init (void *priv,
 	struct tcphdr *tph;
 	const struct iphdr *ih;
 
-	iph = ip_hdr(skb);
-	tph = tcp_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-
-	if (ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_DROP;
-	}
-
 	if (iph->protocol == IPPROTO_TCP) {
 		int i;
-
 		
+		iph = ip_hdr(skb);
+		tph = tcp_hdr(skb);
+		ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+
+		if (ih == NULL) {
+			pr_info("TRUNCATED\n");
+			return NF_DROP;
+		}
+
 		pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
 				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 
@@ -229,6 +228,8 @@ static unsigned int hook_init (void *priv,
 		return NF_ACCEPT;
 
 	}
+	
+	return NF_ACCEPT;
 }
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
