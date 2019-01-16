@@ -161,7 +161,7 @@ int rohc_decomp_init(struct rohc_init *decomp) {
 	return 0;
 
 free_decomp:
-	rohc_comp_free(decomp->compressor);
+	rohc_decomp_free(decomp->decompressor);
 	return NF_DROP;
 }
 
