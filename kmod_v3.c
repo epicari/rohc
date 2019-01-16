@@ -80,70 +80,6 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
-static unsigned int hook_init (void *priv,
-                        struct sk_buff *skb,
-                        const struct nf_hook_state *state) {
-    
-    struct iphdr *iph;
-	struct tcphdr *tph;
-	const struct iphdr *ih;
-
-	iph = ip_hdr(skb);
-	tph = tcp_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-
-	if (ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_DROP;
-	}
-
-	pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
-			ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-
-	if (iph->protocol == IPPROTO_TCP) {
-		int i;
-
-		pr_info("ROHC COMP / DECOMP INIT Start\n");
-	
-		i = rohc_comp_init(&rinit);
-		if (i != 0) {
-			pr_info("failed to init ROHC Compressor\n");
-			return NF_DROP;
-		}
-
-		i = rohc_decomp_init(&rinit);
-		if (i != 0) {
-			pr_info("failed to init ROHC Decompressor\n");
-			return NF_DROP;
-		}
-/*
-		unsigned char *rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-		//unsigned char *ip_packet_in = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-		unsigned char *feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
-		struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
-
-		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		
-		rohc_status_t status;
-
-		status = rohc_compress4(comp->compressor, ip_packet, &rohc_packet);
-				
-		if (status == ROHC_STATUS_OK) {
-			pr_info("ROHC Compression\n");
-			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
-					ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-		}
-		else {
-			pr_info("Compression failed\n");
-			goto free_comp;
-		}
-*/
-		return NF_ACCEPT;
-
-	}
-}
 
 int rohc_comp_init(struct rohc_init *comp) {
 
@@ -228,6 +164,70 @@ free_decomp:
 	return NF_DROP;
 }
 
+static unsigned int hook_init (void *priv,
+                        struct sk_buff *skb,
+                        const struct nf_hook_state *state) {
+    
+    struct iphdr *iph;
+	struct tcphdr *tph;
+	const struct iphdr *ih;
+
+	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+
+	if (ih == NULL) {
+		pr_info("TRUNCATED\n");
+		return NF_DROP;
+	}
+
+	pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
+			ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+
+	if (iph->protocol == IPPROTO_TCP) {
+		int i;
+
+		pr_info("ROHC COMP / DECOMP INIT Start\n");
+	
+		i = rohc_comp_init(&rinit);
+		if (i != 0) {
+			pr_info("failed to init ROHC Compressor\n");
+			return NF_DROP;
+		}
+
+		i = rohc_decomp_init(&rinit);
+		if (i != 0) {
+			pr_info("failed to init ROHC Decompressor\n");
+			return NF_DROP;
+		}
+/*
+		unsigned char *rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+		//unsigned char *ip_packet_in = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+		unsigned char *feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
+		struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
+		struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+
+		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
+		
+		rohc_status_t status;
+
+		status = rohc_compress4(comp->compressor, ip_packet, &rohc_packet);
+				
+		if (status == ROHC_STATUS_OK) {
+			pr_info("ROHC Compression\n");
+			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
+					ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
+		}
+		else {
+			pr_info("Compression failed\n");
+			goto free_comp;
+		}
+*/
+		return NF_ACCEPT;
+
+	}
+}
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context) {
