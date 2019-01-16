@@ -126,11 +126,6 @@ int rohc_comp_init(struct rohc_init *comp,
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
-		
-		for(i = 0; i < rohc_packet.len; i++) {
-			pr_info("Compress Header: 0x%02x ", 
-					rohc_buf_byte_at(rohc_packet, i));
-		}
 	}
 	else {
 		pr_info("Compression failed\n");
