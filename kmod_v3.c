@@ -172,7 +172,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 
 	if (decomp->decompressor == NULL) {
 		pr_info("failed create the ROHC compressor\n");
-		goto free_comp;
+		goto free_comp_v2;
 	}
 /*
 	if(!rohc_decomp_set_traces_cb2(decomp->decompressor, rohc_print_traces, NULL)) {
@@ -212,7 +212,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 free_decomp:
 	rohc_decomp_free(decomp->decompressor);
 	return NF_ACCEPT;
-free_comp:
+free_comp_v2:
 	rohc_comp_free(comp->compressor);
 	return NF_ACCEPT;
 }
