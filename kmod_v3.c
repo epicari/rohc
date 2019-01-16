@@ -172,7 +172,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 
 	if (decomp->decompressor == NULL) {
 		pr_info("failed create the ROHC compressor\n");
-		goto free_comp_v2;
+		goto free_decomp;
 	}
 /*
 	if(!rohc_decomp_set_traces_cb2(decomp->decompressor, rohc_print_traces, NULL)) {
@@ -191,7 +191,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 	}
 
 	status = rohc_decompress3(decomp->decompressor, rohc_packet, &ip_packet, 
-							rcvd_feedback, feedback_to_send);
+							&rcvd_feedback, feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
 	
@@ -212,9 +212,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 free_decomp:
 	rohc_decomp_free(decomp->decompressor);
 	return NF_ACCEPT;
-free_comp_v2:
-	rohc_comp_free(comp->compressor);
-	return NF_ACCEPT;
+
 }
 
 static unsigned int hook_init (void *priv,
