@@ -188,7 +188,7 @@ int rohc_decomp_init(struct rohc_init *decomp,
 	}
 
 	status = rohc_decompress3(decomp->decompressor, rohc_packet, &ip_packet, 
-							rcvd_feedback_buf, feedback_to_send_buf);
+					decomp->rcvd_feedback_buf, decomp->feedback_to_send_buf);
 
 	if(status == ROHC_STATUS_OK) {
 		if(!rohc_buf_is_empty(ip_packet)) {
