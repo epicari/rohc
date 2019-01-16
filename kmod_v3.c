@@ -145,7 +145,7 @@ int rohc_decomp_init(struct rohc_init *decomp) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_decomp;
 	}
-
+/*
 	decomp->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	
 	decomp->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -153,10 +153,11 @@ int rohc_decomp_init(struct rohc_init *decomp) {
 	decomp->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	kfree(decomp);
-	kfree(rohc_pkt_out);
+	kfree(rohc_packet_out);
 	kfree(rcvd_feedback_buf);
 	kfree(feedback_to_send_buf);
-
+*/
+	kfree(decomp);
 	return 0;
 
 free_decomp:
