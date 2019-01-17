@@ -144,7 +144,6 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC compression\n");
 		pr_info("ROHC Packet len = %u", rohc_packet.len);
-		return NF_ACCEPT;
 	}
 	else {
 		pr_info("Compression failed\n");
@@ -154,7 +153,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	return NF_ACCEPT;
+	return 0;
 
 free_comp:
 	rohc_comp_free(rcouple->compressor);
@@ -209,14 +208,13 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 
 		pr_info("ROHC decompression\n");
 		pr_info("ROHC Packet len = %u", rohc_packet.len);
-		return NF_ACCEPT;
 	}
 
 	else {
 		pr_info("ROHC decomp failed\n");
 		goto free_decomp;
 	}
-	return NF_ACCEPT;
+	return 0;
 
 free_decomp:
 	rohc_decomp_free(rcouple->decompressor);
