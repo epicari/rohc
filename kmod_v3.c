@@ -177,7 +177,9 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 	
-	struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	//struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
+													ntohs(ih->tot_len), 0);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
