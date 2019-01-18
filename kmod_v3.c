@@ -172,7 +172,6 @@ free_feedback_send:
 	kfree(rcouple->feedback_to_send_buf);
 free_comp:
 	rohc_comp_free(rcouple->compressor);
-	kfree()
 	return NF_ACCEPT;
 }
 
