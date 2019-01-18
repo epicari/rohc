@@ -143,7 +143,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC compression\n");
-		pr_info("ROHC Packet len = %u", rohc_packet.len);
+		pr_info("ROHC Compression Packet len = %u", rohc_packet.len);
 	}
 	else {
 		pr_info("Compression failed\n");
@@ -166,8 +166,9 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 
-	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_in, BUFFER_SIZE, 0);
-	struct rohc_buf ip_packet = rohc_buf_init_empty(skb->data, ntohs(ih->tot_len));
+	//struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_in, BUFFER_SIZE, 0);
+	struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len));
+	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE, 0);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
@@ -206,8 +207,8 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 			pr_info("IP packet is empty\n");
 		}
 
-		pr_info("ROHC decompression\n");
-		pr_info("ROHC Packet len = %u", rohc_packet.len);
+		pr_info("ROHC Decompression\n");
+		pr_info("ROHC Decompression Packet len = %u", rohc_packet.len);
 	}
 
 	else {
