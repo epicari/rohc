@@ -60,7 +60,8 @@ struct rohc_init {
 
 	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
 
-	size_t rohc_out_size;
+	size_t rohc_out_size; // comp ROHC packet
+	size_t ip_out_size; // decomp IP packet
 
 };
 
@@ -150,7 +151,6 @@ int rohc_comp_init(struct rohc_init *rcouple,
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC compression\n");
-		pr_info("ROHC Compression Packet len = %u", rohc_packet.len);
 	}
 	else {
 		pr_info("Compression failed\n");
@@ -160,6 +160,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
 
 	rcouple->rohc_out_size = rohc_packet.len;
+	pr_info("ROHC Compression Packet len = %u", rcouple->rohc_out_size);
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
@@ -181,8 +182,11 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+	struct rohc_comp *comp_associated = rcouple.compressor;
 
 	rohc_status_t status;
+
+	rcouple->ip_out_size = 0;
 
 	rcouple->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 											ROHC_O_MODE);
@@ -217,13 +221,21 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 		}
 
 		pr_info("ROHC Decompression\n");
-		pr_info("ROHC Decompression Packet len = %u", rohc_packet.len);
 	}
 
 	else {
 		pr_info("ROHC decomp failed\n");
 		goto free_decomp;
 	}
+
+	rcouple->ip_out_size = ip_packet.len;
+	pr_info("ROHC Decompression Packet len = %u", rcouple->ip_out_size);
+
+	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
+		pr_info("failed to deliver received feedback to comp.\n");
+		return free_decomp;
+	}
+
 	return 0;
 
 free_decomp:
