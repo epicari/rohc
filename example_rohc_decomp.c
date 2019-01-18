@@ -49,18 +49,6 @@
 /* dump the given network packet on standard output */
 static void dump_packet(const struct rohc_buf packet);
 
-//
-
-/* user-defined function callbacks for the ROHC library */
-static void print_rohc_traces(void *const priv_ctxt,
-                              const rohc_trace_level_t level,
-                              const rohc_trace_entity_t entity,
-                              const int profile,
-                              const char *const format,
-                              ...)
-	__attribute__((format(printf, 5, 6), nonnull(5)));
-
-//
 
 /**
  * @brief The main entry point for the program
@@ -130,8 +118,6 @@ int main(int argc, char **argv)
 		goto release_decompressor;
 	}
 //! [enable ROHC decompression profiles]
-
-	rohc_decomp_set_traces_cb2(decompressor, print_rohc_traces, NULL);
 
 
 	/* create a fake ROHC packet for the purpose of this program */
