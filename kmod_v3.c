@@ -42,7 +42,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 10241
 
 struct rohc_init {
 
@@ -150,7 +150,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
-		pr_info("ROHC compression\n");
+		pr_info("ROHC Compression\n");
 	}
 	else {
 		pr_info("Compression failed\n");
