@@ -121,12 +121,12 @@ int rohc_comp_init(struct rohc_init *rcouple,
 		goto free_comp;
 	}
 
-	if(!rohc_comp_set_traces_cb2(comp->compressor, rohc_print_traces, NULL)) {
+	if(!rohc_comp_set_traces_cb2(rcouple->compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
 	}
 	
-	if(!rohc_comp_set_features(comp->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
+	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
@@ -192,12 +192,12 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
-	if(!rohc_decomp_set_traces_cb2(decomp->decompressor, rohc_print_traces, NULL)) {
+	if(!rohc_decomp_set_traces_cb2(rcouple->decompressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_decomp;
 	}
 	
-	if(!rohc_decomp_set_features(decomp->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
+	if(!rohc_decomp_set_features(rcouple->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_decomp;
 	}
