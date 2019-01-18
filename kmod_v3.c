@@ -235,7 +235,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 
 	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
-		return free_decomp;
+		goto free_decomp;
 	}
 
 	return 0;
