@@ -55,7 +55,12 @@ struct rohc_init {
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
 
+	unsigned char *ip_pkt_out; // decomp IP packet
+	unsigned char *ip_pkt_in; // comp IP packet
+
 	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
+
+	size_t rohc_out_size;
 
 };
 
@@ -106,6 +111,8 @@ int rohc_comp_init(struct rohc_init *rcouple,
 
 	rohc_status_t status;
 
+	rcouple->rohc_out_size = 0;
+
 	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
 
@@ -113,7 +120,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 		pr_info("failed create the ROHC compressor\n");
 		goto free_comp;
 	}
-/*
+
 	if(!rohc_comp_set_traces_cb2(comp->compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
@@ -123,7 +130,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
-*/
+
 	if(!rohc_comp_enable_profile(rcouple->compressor, ROHC_PROFILE_TCP)) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_comp;
@@ -151,6 +158,9 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	}
 
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
+
+	rcouple->rohc_out_size = rohc_packet.len;
+
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
 	return 0;
@@ -165,8 +175,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 				struct iphdr *ih) {
 
 	pr_info("ROHC_DECOMP_INIT\n");
-
-	//struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_in, BUFFER_SIZE, 0);
+	
 	struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
@@ -182,7 +191,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 		pr_info("failed create the ROHC compressor\n");
 		goto free_decomp;
 	}
-/*
+
 	if(!rohc_decomp_set_traces_cb2(decomp->decompressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_decomp;
@@ -192,7 +201,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 		pr_info("failed to enable packet dumps\n");
 		goto free_decomp;
 	}
-*/
+
 	if(!rohc_decomp_enable_profile(rcouple->decompressor, ROHC_PROFILE_TCP)) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_decomp;
