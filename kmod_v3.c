@@ -158,7 +158,7 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
 
 	rcouple->rohc_out_size = rohc_packet.len;
-	pr_info("ROHC Compression Packet len = %u", rcouple->rohc_out_size);
+	pr_info("Compression Packet len = %u", rcouple->rohc_out_size);
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
@@ -225,11 +225,6 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 							&rcvd_feedback, feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
-	
-		if(!rohc_buf_is_empty(ip_packet)) {
-			pr_info("IP packet is empty\n");
-		}
-
 		pr_info("ROHC Decompression\n");
 	}
 
@@ -239,7 +234,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 	}
 
 	rcouple->ip_out_size = ip_packet.len;
-	pr_info("ROHC Decompression Packet len = %u", rcouple->ip_out_size);
+	pr_info("Decompression Packet len = %u", rcouple->ip_out_size);
 
 	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
