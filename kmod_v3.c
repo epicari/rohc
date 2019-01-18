@@ -184,7 +184,7 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
-	struct rohc_comp *comp_associated = &rcouple->compressor;
+	struct rohc_comp *comp_associated = rcouple->compressor;
 
 	rohc_status_t status;
 
