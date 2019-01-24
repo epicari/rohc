@@ -42,7 +42,30 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 10241
+
+struct rohc_init {
+
+	struct rohc_comp *compressor;
+	struct rohc_decomp *decompressor;
+
+	unsigned char *rohc_packet_out; // comp ROHC packet
+	unsigned char *rohc_packet_in; // ROHC packet to decomp
+
+	unsigned char *feedback_to_send_buf; // feedback to send decomp
+	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
+
+	unsigned char *ip_pkt_out; // decomp IP packet
+	unsigned char *ip_pkt_in; // comp IP packet
+
+	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
+
+	size_t rohc_out_size; // comp ROHC packet
+	size_t ip_out_size; // decomp IP packet
+
+};
+
+static struct rohc_init rinit;
 
 static struct nf_hook_ops nfho;
 
@@ -63,87 +86,213 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
-static unsigned int hook_comp (void *priv,
+
+int rohc_comp_init(struct rohc_init *rcouple,
+				struct sk_buff *skb,
+				struct iphdr *ih) {
+
+	pr_info("ROHC_COMP_INIT\n");
+
+	memset(rcouple, 0, sizeof(struct rohc_init));
+
+	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(rcouple->rohc_packet_out == NULL)
+		goto free_comp;
+	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(rcouple->rcvd_feedback_buf == NULL)
+		return NF_ACCEPT;
+	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(rcouple->feedback_to_send_buf == NULL)
+		return NF_ACCEPT;
+
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+
+	rohc_status_t status;
+
+	rcouple->rohc_out_size = 0;
+
+	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+									gen_false_random_num, NULL);
+
+	if (rcouple->compressor == NULL) {
+		pr_info("failed create the ROHC compressor\n");
+		goto free_comp;
+	}
+
+	if(!rohc_comp_set_traces_cb2(rcouple->compressor, rohc_print_traces, NULL)) {
+		pr_info("cannot set trace callback for compressor\n");
+		goto free_comp;
+	}
+	
+	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
+		pr_info("failed to enable packet dumps\n");
+		goto free_comp;
+	}
+
+	if(!rohc_comp_enable_profile(rcouple->compressor, ROHC_PROFILE_TCP)) {
+		pr_info("failed to enable the TCP profile\n");
+		goto free_comp;
+	}
+
+	rcouple->feedback_to_send.time.sec = 0;
+	rcouple->feedback_to_send.time.nsec = 0;
+	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send.offset = 0;
+	rcouple->feedback_to_send.len = 0;
+
+	rohc_buf_append_buf(&rohc_packet, rcouple->feedback_to_send);
+	rohc_buf_pull(&rohc_packet, rcouple->feedback_to_send.len);
+
+	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
+
+	if (status == ROHC_STATUS_OK) {
+		pr_info("ROHC Compression\n");
+	}
+	else {
+		pr_info("Compression failed\n");
+		goto free_comp;
+	}
+
+	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
+
+	rcouple->rohc_out_size = rohc_packet.len;
+	pr_info("Compression Packet len = %u", rcouple->rohc_out_size);
+
+	rohc_buf_reset(&rcouple->feedback_to_send);
+
+	return 0;
+
+free_pkt_out:
+	kfree(rcouple->rohc_packet_out);
+free_rcvd_feedback:
+	kfree(rcouple->rcvd_feedback_buf);
+free_feedback_send:
+	kfree(rcouple->feedback_to_send_buf);
+free_comp:
+	rohc_comp_free(rcouple->compressor);
+	return NF_ACCEPT;
+}
+
+int rohc_decomp_init(struct rohc_init *rcouple,
+				struct sk_buff *skb,
+				struct iphdr *ih) {
+
+	pr_info("ROHC_DECOMP_INIT\n");
+
+	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(rcouple->rohc_packet_in == NULL)
+		goto free_pkt_in;
+	
+	//struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
+													ntohs(ih->tot_len), 0);
+	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
+	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
+														BUFFER_SIZE);
+	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+	struct rohc_comp *comp_associated = rcouple->compressor;
+
+	rohc_status_t status;
+
+	rcouple->ip_out_size = 0;
+
+	rcouple->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+											ROHC_O_MODE);
+
+	if (rcouple->decompressor == NULL) {
+		pr_info("failed create the ROHC compressor\n");
+		goto free_decomp;
+	}
+
+	if(!rohc_decomp_set_traces_cb2(rcouple->decompressor, rohc_print_traces, NULL)) {
+		pr_info("cannot set trace callback for compressor\n");
+		goto free_decomp;
+	}
+	
+	if(!rohc_decomp_set_features(rcouple->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
+		pr_info("failed to enable packet dumps\n");
+		goto free_decomp;
+	}
+
+	if(!rohc_decomp_enable_profile(rcouple->decompressor, ROHC_PROFILE_TCP)) {
+		pr_info("failed to enable the TCP profile\n");
+		goto free_decomp;
+	}
+
+	status = rohc_decompress3(rcouple->decompressor, rohc_packet, &ip_packet, 
+							&rcvd_feedback, feedback_to_send);
+
+	if(status == ROHC_STATUS_OK) {
+		pr_info("ROHC Decompression\n");
+	}
+
+	else {
+		pr_info("ROHC decomp failed\n");
+		goto free_decomp;
+	}
+
+	rcouple->ip_out_size = ip_packet.len;
+	pr_info("Decompression Packet len = %u", rcouple->ip_out_size);
+
+	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
+		pr_info("failed to deliver received feedback to comp.\n");
+		goto free_decomp;
+	}
+
+	return 0;
+
+free_pkt_in:
+	kfree(rcouple->rohc_packet_in);
+
+free_decomp:
+	rohc_decomp_free(rcouple->decompressor);
+	return NF_ACCEPT;
+
+}
+
+static unsigned int hook_init (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
     
     struct iphdr *iph;
 	struct tcphdr *tph;
-	const struct iphdr *ih;
+	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-	
-	pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
-			ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
 
 	if (ih == NULL) {
 		pr_info("TRUNCATED\n");
-		return NF_DROP;
+		return NF_ACCEPT;
 	}
 
 	if (iph->protocol == IPPROTO_TCP) {
+		int i;
 
-		pr_info("ROHC Compressor ON\n");
-
-		struct rohc_comp *compressor = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
-		unsigned char *rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-		//unsigned char *ip_packet_in = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-		unsigned char *feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
-		struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
-
-		struct rohc_buf feedback_to_send = rohc_buf_init_empty(rohc_packet_out, BUFFER_SIZE);
-		
-		rohc_status_t status;
-
-		compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
-									gen_false_random_num, NULL);
-
-		if (compressor == NULL) {
-			pr_info("failed create the ROHC compressor\n");
-			return NF_DROP;
-		}
-
-		if(!rohc_comp_set_traces_cb2(compressor, rohc_print_traces, NULL)) {
-			pr_info("cannot set trace callback for compressor\n");
-			return NF_DROP;
-		}
-
-		if(!rohc_comp_set_features(compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
-			pr_info("failed to enable packet dumps\n");
-			return NF_DROP;
-		}
-
-		if(!rohc_comp_enable_profile(compressor, ROHC_PROFILE_TCP)) {
-			pr_info("failed to enable the TCP profile\n");
-			return NF_DROP;
-		}
-
-		status = rohc_compress4(compressor, ip_packet, &rohc_packet);
-				
-		if (status == ROHC_STATUS_OK) {
-			pr_info("ROHC Compression\n");
-			pr_info("Compress Header LEN=%u TTL=%u ID=%u DATA=%u",
+		pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
 				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-		}
-		else {
-			pr_info("Compression failed\n");
-			return NF_DROP;
+
+		pr_info("ROHC COMP / DECOMP INIT Start\n");
+	
+		i = rohc_comp_init(&rinit, skb, ih);
+		if (i != 0) {
+			pr_info("failed to init ROHC Compressor\n");
+			return NF_ACCEPT;
 		}
 
-		rohc_comp_free(compressor);
-		kfree(compressor);
-		kfree(rohc_packet_out);
-		//kfree(ip_packet_in);
-		kfree(feedback_to_send_buf);
+		i = rohc_decomp_init(&rinit, skb, ih);
+		if (i != 0) {
+			pr_info("failed to init ROHC Decompressor\n");
+			return NF_ACCEPT;
+		}
 
 		return NF_ACCEPT;
-
 	}
+
+	return NF_ACCEPT;
 }
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
@@ -152,8 +301,9 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 }
 
 static int my_comp(void) {
-    nfho.hook = hook_comp;
-    nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+    nfho.hook = hook_init;
+    //nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfho.hooknum = NF_INET_LOCAL_IN;
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
 	nfho.priv = NULL;
