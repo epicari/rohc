@@ -187,7 +187,6 @@ int rohc_decomp(struct rohc_init *rcouple,
 	if(rcouple->rohc_packet_in == NULL)
 		goto free_pkt_in;
 	
-	//struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													ntohs(ih->tot_len), 0);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
