@@ -65,8 +65,7 @@ int main(int argc, char const *argv[]){
             return -1;
         
     }
-
-    fputs('\n', stdout);
+    
     close(server_fd);
 
     return 0;
