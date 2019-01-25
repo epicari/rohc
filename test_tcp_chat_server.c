@@ -53,7 +53,7 @@ int main(int argc, char const *argv[]){
         memset(sendBuf, 0, sizeof(sendBuf));
         memset(rcvdBuf, 0, sizeof(rcvdBuf));
 
-        if(recv(sock, rcvdBuf, BUFFER_SIZE, 0) == -1)
+        if(recv(server_fd, rcvdBuf, BUFFER_SIZE, 0) == -1)
             return -1;
         else
             printf("Client: %s\n", rcvdBuf);
@@ -61,13 +61,13 @@ int main(int argc, char const *argv[]){
         printf("Server: ");
         fgets(sendBuf, BUFFER_SIZE, stdin);
 
-        if(send(sock, sendBuf, strlen(sendBuf), 0) == -1)
+        if(send(server_fd, sendBuf, strlen(sendBuf), 0) == -1)
             return -1;
         
     }
 
     fputs('\n', stdout);
-    close(sock);
+    close(server_fd);
 
     return 0;
 }
