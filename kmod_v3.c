@@ -363,7 +363,7 @@ module_exit(my_comp_exit && my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Didier Barvaux, Mikhail Gruzdev, Thales Communications, Viveris Technologies");
+MODULE_AUTHOR("Suho CHOI");
 MODULE_DESCRIPTION(PACKAGE_NAME
 	", version " PACKAGE_VERSION PACKAGE_REVNO " (" PACKAGE_URL ")");
 
