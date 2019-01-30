@@ -54,7 +54,7 @@ int main(int argc, char const *argv[]){
         memset(Buf, 0, sizeof(Buf));
         memeset(message, 0, sizeof(message));
 
-        rval = recv(new_socket, Buf, BUFFER_SIZE, 0);
+        ssize_t rval = recv(new_socket, Buf, BUFFER_SIZE, 0);
         
         if(rval == -1)
             return -1;
