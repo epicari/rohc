@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netinet/in.h>
 #include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
@@ -69,8 +71,8 @@ int main(int argc, char const *argv[]){
             break;
     }
 
-    pclose(sock);
-    pclose(new_socket);
+    close(sock);
+    close(new_socket);
 
     return 0;
 }
