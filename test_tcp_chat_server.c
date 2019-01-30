@@ -11,60 +11,66 @@
 int main(int argc, char const *argv[]){
     
     struct sockaddr_in address;
-    int server_fd, new_socket;
+    int sock, new_socket;
     int opt = 1;
     int addrlen = sizeof(address);
-    char sendBuf[BUFFER_SIZE];
-    char rcvdBuf[BUFFER_SIZE];
-
-    //Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
+    char Buf[BUFFER_SIZE];
+    char message[BUFFER_SIZE];
+    
+    // Creating socket
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("socket failed");
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
-    //Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
+    memset(&address, '0', sizeof(address));
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
-    //Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0 ){
+    // Bind
+    if (bind(sock, (struct sockaddr *)&address, sizeof(address)) == -1 ){
         perror("bind failed");
-        exit(EXIT_FAILURE);
+        return -1;
     }
-
-    if(listen(server_fd, 3) < 0 ){
+    
+    // Listen
+    if(listen(sock, 3) == -1 ){
         perror("listen");
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
-    if((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0 ){
+    // Accept
+    new_socket = accept(sock, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+    if(new_socket == -1) {
         perror("accept");
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
     while(1){
-        memset(sendBuf, 0, sizeof(sendBuf));
-        memset(rcvdBuf, 0, sizeof(rcvdBuf));
+        memset(Buf, 0, sizeof(Buf));
+        memeset(message, 0, sizeof(message));
 
-        if(recv(server_fd, rcvdBuf, BUFFER_SIZE, 0) == -1)
+        rval = recv(new_socket, Buf, BUFFER_SIZE, 0);
+        
+        if(rval == -1)
             return -1;
         else
-            printf("Client: %s\n", rcvdBuf);
+            printf("Client: %s\n", Buf);
 
         printf("Server: ");
-        fgets(sendBuf, BUFFER_SIZE, stdin);
+        fgets(message, BUFFER_SIZE, stdin);
 
-        if(send(server_fd, sendBuf, strlen(sendBuf), 0) == -1)
-            return -1;
-        
+        if(send(new_socket, message, strlen(message), 0) == -1)
+            return -1;  
+
+        if(strcmp(message, "/quit\n") == 0)
+            break;
     }
+
+    close(sock);
+    close(new_socket);
 
     return 0;
 }
