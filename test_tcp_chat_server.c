@@ -69,8 +69,8 @@ int main(int argc, char const *argv[]){
             break;
     }
 
-    close(sock);
-    close(new_socket);
+    pclose(sock);
+    pclose(new_socket);
 
     return 0;
 }

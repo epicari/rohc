@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]){
             break;
     }
 
-    close(sock);
+    pclose(sock);
 
     return 0;
 }
