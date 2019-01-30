@@ -55,8 +55,5 @@ int main(int argc, char const *argv[]){
             printf("Server: %s\n", rcvdBuf);
     }
 
-    fputc('\n', stdout);
-    close(sock);
-
     return 0;
-}
+}z
