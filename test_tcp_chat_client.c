@@ -46,6 +46,7 @@ int main(int argc, char const *argv[]){
 
         printf("Client: ");
         fgets(sendBuf, BUFFER_SIZE, stdin);
+        printf("\n");
 
         if(send(sock, sendBuf, strlen(sendBuf), 0) == -1)
             return -1;

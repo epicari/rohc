@@ -16,8 +16,8 @@ int main(int argc, char const *argv[]){
     int sock, new_socket;
     int opt = 1;
     int addrlen = sizeof(address);
-    char Buf[BUFFER_SIZE];
-    char message[BUFFER_SIZE];
+    char rcvdBuf[BUFFER_SIZE];
+    char sendBuf[BUFFER_SIZE];
     
     // Creating socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == 0){
@@ -51,23 +51,24 @@ int main(int argc, char const *argv[]){
     }
 
     while(1){
-        memset(Buf, 0, sizeof(Buf));
-        memset(message, 0, sizeof(message));
+        memset(rcvdBuf, 0, sizeof(rcvdBuf));
+        memset(sendBuf, 0, sizeof(sendBuf));
 
-        ssize_t rval = recv(new_socket, Buf, BUFFER_SIZE, 0);
+        printf("Server: ");
+        fgets(sendBuf, BUFFER_SIZE, stdin);
+        printf("\n");
+        
+        if(send(new_socket, sendBuf, strlen(sendBuf), 0) == -1)
+            return -1;  
+
+        ssize_t rval = recv(new_socket, rcvdBuf, BUFFER_SIZE, 0);
         
         if(rval == -1)
             return -1;
         else
-            printf("Client: %s\n", Buf);
+            printf("Client: %s\n", rcvdBuf);
 
-        printf("Server: ");
-        fgets(message, BUFFER_SIZE, stdin);
-
-        if(send(new_socket, message, strlen(message), 0) == -1)
-            return -1;  
-
-        if(strcmp(message, "/quit\n") == 0)
+        if(strcmp(rcvdBuf, "/quit\n") == 0)
             break;
     }
 
