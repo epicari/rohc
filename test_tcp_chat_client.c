@@ -51,13 +51,17 @@ int main(int argc, char const *argv[]){
         if(send(sock, sendBuf, strlen(sendBuf), 0) == -1)
             return -1;
 
+        if(strcmp(sendBuf, "/quit\n") == 0)
+            break;
+
         if(recv(sock, rcvdBuf, BUFFER_SIZE, 0) == -1)
             return -1;
-        else
-            printf("Server: %s\n", rcvdBuf);
 
         if(strcmp(rcvdBuf, "/quit\n") == 0)
             break;
+        else
+            printf("Server: %s\n", rcvdBuf);
+
     }
 
     close(sock);

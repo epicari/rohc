@@ -54,13 +54,6 @@ int main(int argc, char const *argv[]){
         memset(rcvdBuf, 0, sizeof(rcvdBuf));
         memset(sendBuf, 0, sizeof(sendBuf));
 
-        printf("Server: ");
-        fgets(sendBuf, BUFFER_SIZE, stdin);
-        printf("\n");
-        
-        if(send(new_socket, sendBuf, strlen(sendBuf), 0) == -1)
-            return -1;  
-
         ssize_t rval = recv(new_socket, rcvdBuf, BUFFER_SIZE, 0);
         
         if(rval == -1)
@@ -69,6 +62,16 @@ int main(int argc, char const *argv[]){
             printf("Client: %s\n", rcvdBuf);
 
         if(strcmp(rcvdBuf, "/quit\n") == 0)
+            break;
+
+        printf("Server: ");
+        fgets(sendBuf, BUFFER_SIZE, stdin);
+        printf("\n");
+
+        if(send(new_socket, sendBuf, strlen(sendBuf), 0) == -1)
+            return -1;  
+
+        if(strcmp(sendBuf, "/quit\n") == 0)
             break;
     }
 
