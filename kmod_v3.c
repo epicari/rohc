@@ -356,10 +356,10 @@ static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
-module_init(my_comp);
-module_init(my_decomp);
-module_exit(my_comp_exit);
-module_exit(my_decomp_exit);
+module_init(my_comp && my_decomp);
+//module_init(my_decomp);
+module_exit(my_comp_exit && my_decomp_exit);
+//module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
