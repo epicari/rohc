@@ -18,19 +18,19 @@ int main(int argc, char const *argv[]){
     char sendBuf[BUFFER_SIZE];
     char rcvdBuf[BUFFER_SIZE];
 
-    // socket(domain, type, protocol), domain = AF_INET (IPv4), type = SOCK_STREAM (TCP), protocol = 0 (default)
-    if((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1 ){
+    // socket(domain, type, protocol), domain = PF_INET (IPv4), type = SOCK_STREAM (TCP), protocol = 0 (default)
+    if((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1 ){
         printf("\n Socket creation error \n");
         return -1;
     }
 
     memset(&serv_addr, '0', sizeof(serv_addr)); 
 
-    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_family = PF_INET;
     serv_addr.sin_port = htons(PORT);
 
     //Convert IPv4 and IPv6 address from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0 ){
+    if(inet_pton(PF_INET, "127.0.0.1", &serv_addr.sin_addr) == -1 ){
         printf("\nInvalid address/ Address not supported \n ");
         return -1;
     }

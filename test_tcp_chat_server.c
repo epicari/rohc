@@ -20,14 +20,14 @@ int main(int argc, char const *argv[]){
     char sendBuf[BUFFER_SIZE];
     
     // Creating socket
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == 0){
+    if ((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1){
         perror("socket failed");
         return -1;
     }
 
     memset(&address, '0', sizeof(address));
 
-    address.sin_family = AF_INET;
+    address.sin_family = PF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
