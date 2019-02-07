@@ -164,7 +164,7 @@ int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	return 0;
+	return NF_ACCEPT;
 
 free_pkt_out:
 	kfree(rcouple->rohc_packet_out);
@@ -244,7 +244,7 @@ int rohc_decomp(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
-	return 0;
+	return NF_ACCEPT;
 
 free_pkt_in:
 	kfree(rcouple->rohc_packet_in);
@@ -278,15 +278,8 @@ static unsigned int hook_comp (void *priv,
 	}
 
 	if (iph->protocol == IPPROTO_TCP) {
-		int i;
-	
-		i = rohc_comp(&rinit, skb, ih);
-		if (i != 0) {
-			pr_info("failed to init ROHC Compressor\n");
-			return NF_ACCEPT;
-		}
-		else
-			return NF_ACCEPT;
+
+		rohc_comp(&rinit, skb, ih);
 	}
 
 	return NF_ACCEPT;
@@ -310,15 +303,8 @@ static unsigned int hook_decomp (void *priv,
 	}
 
 	if (iph->protocol == IPPROTO_TCP) {
-		int i;
 	
-		i = rohc_decomp(&rinit, skb, ih);
-		if (i != 0) {
-			pr_info("failed to init ROHC Decompressor\n");
-			return NF_ACCEPT;
-		}
-		else
-			return NF_ACCEPT;
+		rohc_decomp(&rinit, skb, ih);
 	}
 
 	return NF_ACCEPT;
