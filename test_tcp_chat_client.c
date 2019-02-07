@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]){
     char rcvdBuf[BUFFER_SIZE];
 
     // Createing socket
-    if((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1 ){
+    if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1 ){
         printf("\n Socket creation error \n");
         return -1;
     }
