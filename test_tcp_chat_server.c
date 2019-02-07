@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]){
     char sendBuf[BUFFER_SIZE];
     
     // Creating socket
-    if ((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1){
+    if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1){
         perror("socket failed");
         return -1;
     }
