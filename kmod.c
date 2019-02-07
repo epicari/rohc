@@ -87,7 +87,7 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 }
 
 
-int rohc_comp_init(struct rohc_init *rcouple,
+int rohc_comp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
 
@@ -145,6 +145,8 @@ int rohc_comp_init(struct rohc_init *rcouple,
 	rohc_buf_append_buf(&rohc_packet, rcouple->feedback_to_send);
 	rohc_buf_pull(&rohc_packet, rcouple->feedback_to_send.len);
 
+	pr_info("ROHC_COMP_START\n");
+
 	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
@@ -175,7 +177,7 @@ free_comp:
 	return NF_ACCEPT;
 }
 
-int rohc_decomp_init(struct rohc_init *rcouple,
+int rohc_decomp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
 
@@ -185,7 +187,6 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 	if(rcouple->rohc_packet_in == NULL)
 		goto free_pkt_in;
 	
-	//struct rohc_buf rohc_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													ntohs(ih->tot_len), 0);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
@@ -221,6 +222,8 @@ int rohc_decomp_init(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
+	pr_info("ROHC_DECOMP_START\n");
+
 	status = rohc_decompress3(rcouple->decompressor, rohc_packet, &ip_packet, 
 							&rcvd_feedback, feedback_to_send);
 
@@ -252,7 +255,12 @@ free_decomp:
 
 }
 
-static unsigned int hook_init (void *priv,
+static int gen_false_random_num(const struct rohc_comp *const comp,
+								void *const user_context) {
+	return 0;
+}
+
+static unsigned int hook_comp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
     
@@ -271,19 +279,40 @@ static unsigned int hook_init (void *priv,
 
 	if (iph->protocol == IPPROTO_TCP) {
 		int i;
-
-		pr_info("Origin IP LEN=%u TTL=%u ID=%u DATA=%u",
-				ntohs(ih->tot_len), ih->ttl, ntohs(ih->id), skb->data);
-
-		pr_info("ROHC COMP / DECOMP INIT Start\n");
 	
-		i = rohc_comp_init(&rinit, skb, ih);
+		i = rohc_comp(&rinit, skb, ih);
 		if (i != 0) {
 			pr_info("failed to init ROHC Compressor\n");
 			return NF_ACCEPT;
 		}
 
-		i = rohc_decomp_init(&rinit, skb, ih);
+		return NF_ACCEPT;
+	}
+
+	return NF_ACCEPT;
+}
+
+static unsigned int hook_decomp (void *priv,
+                        struct sk_buff *skb,
+                        const struct nf_hook_state *state) {
+    
+    struct iphdr *iph;
+	struct tcphdr *tph;
+	struct iphdr *ih;
+
+	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+
+	if (ih == NULL) {
+		pr_info("TRUNCATED\n");
+		return NF_ACCEPT;
+	}
+
+	if (iph->protocol == IPPROTO_TCP) {
+		int i;
+	
+		i = rohc_decomp(&rinit, skb, ih);
 		if (i != 0) {
 			pr_info("failed to init ROHC Decompressor\n");
 			return NF_ACCEPT;
@@ -295,15 +324,9 @@ static unsigned int hook_init (void *priv,
 	return NF_ACCEPT;
 }
 
-static int gen_false_random_num(const struct rohc_comp *const comp,
-								void *const user_context) {
-	return 0;
-}
-
 static int my_comp(void) {
-    nfho.hook = hook_init;
-    //nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-	nfho.hooknum = NF_INET_LOCAL_IN;
+    nfho.hook = hook_comp;
+    nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
 	nfho.priv = NULL;
@@ -317,12 +340,30 @@ static void my_comp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
+static int my_decomp(void) {
+    nfho.hook = hook_decomp;
+    nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+    nfho.pf = NFPROTO_IPV4;
+    nfho.priority = NF_IP_PRI_FIRST;
+	nfho.priv = NULL;
+
+    nf_register_net_hook(&init_net, &nfho);
+
+    return 0;
+}
+
+static void my_decomp_exit(void) {
+    nf_unregister_net_hook(&init_net, &nfho);
+}
+
 module_init(my_comp);
+module_init(my_decomp);
 module_exit(my_comp_exit);
+module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Didier Barvaux, Mikhail Gruzdev, Thales Communications, Viveris Technologies");
+MODULE_AUTHOR("Suho CHOI");
 MODULE_DESCRIPTION(PACKAGE_NAME
 	", version " PACKAGE_VERSION PACKAGE_REVNO " (" PACKAGE_URL ")");
 
