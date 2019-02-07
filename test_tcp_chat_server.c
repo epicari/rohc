@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]){
         ssize_t rval = recv(new_socket, rcvdBuf, BUFFER_SIZE, 0);
         
         if(rval == -1)
-            return -1;
+            break;
         else
             printf("Client: %s\n", rcvdBuf);
 
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]){
         printf("\n");
 
         if(send(new_socket, sendBuf, strlen(sendBuf), 0) == -1)
-            return -1;  
+            break;  
 
         if(strcmp(sendBuf, "/quit\n") == 0)
             break;

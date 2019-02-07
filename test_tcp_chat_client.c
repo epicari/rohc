@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]){
     char sendBuf[BUFFER_SIZE];
     char rcvdBuf[BUFFER_SIZE];
 
-    // socket(domain, type, protocol), domain = PF_INET (IPv4), type = SOCK_STREAM (TCP), protocol = 0 (default)
+    // Createing socket
     if((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1 ){
         printf("\n Socket creation error \n");
         return -1;
@@ -49,13 +49,13 @@ int main(int argc, char const *argv[]){
         printf("\n");
 
         if(send(sock, sendBuf, strlen(sendBuf), 0) == -1)
-            return -1;
+            break;
 
         if(strcmp(sendBuf, "/quit\n") == 0)
             break;
 
         if(recv(sock, rcvdBuf, BUFFER_SIZE, 0) == -1)
-            return -1;
+            break;
 
         if(strcmp(rcvdBuf, "/quit\n") == 0)
             break;
