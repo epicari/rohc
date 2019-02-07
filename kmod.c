@@ -100,10 +100,10 @@ int rohc_comp(struct rohc_init *rcouple,
 		goto free_comp;
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rcvd_feedback_buf == NULL)
-		return NF_ACCEPT;
+		goto free_rcvd_feedback;
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->feedback_to_send_buf == NULL)
-		return NF_ACCEPT;
+		goto free_feedback_send;
 
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
@@ -174,7 +174,7 @@ free_feedback_send:
 	kfree(rcouple->feedback_to_send_buf);
 free_comp:
 	rohc_comp_free(rcouple->compressor);
-	return NF_ACCEPT;
+	return 0;
 }
 
 int rohc_decomp(struct rohc_init *rcouple,
@@ -251,7 +251,7 @@ free_pkt_in:
 
 free_decomp:
 	rohc_decomp_free(rcouple->decompressor);
-	return NF_ACCEPT;
+	return 0;
 
 }
 
@@ -285,8 +285,8 @@ static unsigned int hook_comp (void *priv,
 			pr_info("failed to init ROHC Compressor\n");
 			return NF_ACCEPT;
 		}
-
-		return NF_ACCEPT;
+		else
+			return NF_ACCEPT;
 	}
 
 	return NF_ACCEPT;
@@ -317,8 +317,8 @@ static unsigned int hook_decomp (void *priv,
 			pr_info("failed to init ROHC Decompressor\n");
 			return NF_ACCEPT;
 		}
-
-		return NF_ACCEPT;
+		else
+			return NF_ACCEPT;
 	}
 
 	return NF_ACCEPT;
