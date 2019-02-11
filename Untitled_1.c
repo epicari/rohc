@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     int sd;  
     
     char buf[BUFSIZE];
-    char cbuf[BUFSIZE] = {"~/git/rohc/hello.c"};  
+    char cbuf[BUFSIZE];
     int len;  
     struct sockaddr_in serv_addr;  
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         error_handling("connect() error!");  
 
     /* 원하는 데이터를 입력 */
-    //fgets(cbuf, 10, stdin);
+    fgets(cbuf, 10, stdin);
     
     write(sd, cbuf, 5);     
     
