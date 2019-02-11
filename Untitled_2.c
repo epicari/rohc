@@ -56,7 +56,7 @@ int main(int argc, char **argv)
         /* 접속해오는 클라이언트에게 전송해줄 파일 오픈  */  
     fd = open( cbuf, O_RDONLY );   
     if(fd == -1)  
-        error_handling("File open error");  
+        error_handling(" File open error");  
         
         /* 클라이언트에 데이터 전송 */  
     while( (len=read(fd, buf, BUFSIZE)) != 0 )  
