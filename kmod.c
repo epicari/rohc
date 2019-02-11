@@ -265,11 +265,9 @@ static unsigned int hook_comp (void *priv,
                         const struct nf_hook_state *state) {
     
     struct iphdr *iph;
-	struct tcphdr *tph;
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
-	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (ih == NULL) {
@@ -290,11 +288,9 @@ static unsigned int hook_decomp (void *priv,
                         const struct nf_hook_state *state) {
     
     struct iphdr *iph;
-	struct tcphdr *tph;
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
-	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (ih == NULL) {
@@ -341,6 +337,8 @@ static int my_decomp(void) {
 static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
+
+/* Test module... select one */
 
 module_init(my_comp);
 module_init(my_decomp);
