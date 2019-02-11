@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 	time_t current_time; //현재 시간을 출력해 주기 위해 시간을 저장할 변수
 	time( &current_time);	 //현재의 시간을 저장
 	char file_name[BUF_SIZE]; //FILE NAME을 저장할 버퍼 주소
-	sprintf(file_name, "%d.c",current_time);//파일의 제목을 "현재시간.pdf"로 설정
+	//sprintf(file_name, "%d.c",current_time);//파일의 제목을 "현재시간.pdf"로 설정
 	printf("%s\n",file_name); //해당하는 파일 이름을 클라이언트에서 출력
 	
 	fp = fopen(file_name,"wb"); //해당 파일에다가 쓰기위한 파일 포인터를 가져옴.
