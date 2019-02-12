@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 
 #define PORT 8080
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 10241
 
 int main(int argc, char const *argv[]){
     
@@ -18,6 +18,11 @@ int main(int argc, char const *argv[]){
     int addrlen = sizeof(address);
     char rcvdBuf[BUFFER_SIZE];
     char sendBuf[BUFFER_SIZE];
+
+    int read_cnt;
+    FILE *fp;
+
+    fp = fopen("Speech.mp3", "rb");
     
     // Creating socket
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1){
@@ -53,7 +58,7 @@ int main(int argc, char const *argv[]){
     while(1){
         memset(rcvdBuf, 0, sizeof(rcvdBuf));
         memset(sendBuf, 0, sizeof(sendBuf));
-
+/*
         ssize_t rval = recv(new_socket, rcvdBuf, BUFFER_SIZE, 0);
         
         if(rval == -1)
@@ -73,8 +78,17 @@ int main(int argc, char const *argv[]){
 
         if(strcmp(sendBuf, "/quit\n") == 0)
             break;
+*/
+    read_cnt = fread((void*)sendBuf, 1, BUFFER_SIZE, fp);
+    if(read_cnt < BUFFER_SIZE) {
+        write(new_socket, BUFFER_SIZE, read_cnt);
+        break;
+    }
+    write(new_socket, sendBuf, BUFFER_SIZE);
+
     }
 
+    fclose(fp);
     close(sock);
     close(new_socket);
 

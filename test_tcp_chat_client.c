@@ -8,15 +8,22 @@
 #include <arpa/inet.h>
 
 #define PORT 8080
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 10241
 
 int main(int argc, char const *argv[]){
 
     int sock;
     struct sockaddr_in serv_addr;
 
+    FILE *fp;
+    int read_cnt;
+
     char sendBuf[BUFFER_SIZE];
     char rcvdBuf[BUFFER_SIZE];
+
+    char file_name[BUFFER_SIZE];
+    printf("%s\n", file_name);
+    fp = fopen(file_name, "wb");
 
     // Createing socket
     if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1 ){
@@ -43,7 +50,7 @@ int main(int argc, char const *argv[]){
     while(1) {
         memset(sendBuf, 0, sizeof(sendBuf));
         memset(rcvdBuf, 0, sizeof(rcvdBuf));
-
+/*
         printf("Client: ");
         fgets(sendBuf, BUFFER_SIZE, stdin);
         printf("\n");
@@ -61,9 +68,12 @@ int main(int argc, char const *argv[]){
             break;
         else
             printf("Server: %s\n", rcvdBuf);
-
+*/
+        read_cnt = read(sock, rcvdBuf, fp);
+        fwrite((void*)rcvdBuf, 1, read_cnt, fp);
     }
 
+    fclose(fp);
     close(sock);
 
     return 0;
