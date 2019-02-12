@@ -130,7 +130,8 @@ int rohc_comp(struct rohc_init *rcouple,
 		goto free_comp;
 	}
 
-	if(!rohc_comp_enable_profile(rcouple->compressor, ROHC_PROFILE_TCP)) {
+	if(!rohc_comp_enable_profiles(rcouple->compressor,
+									ROHC_PROFILE_TCP, ROHC_PROFILE_IP, -1)) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_comp;
 	}
@@ -217,7 +218,8 @@ int rohc_decomp(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
-	if(!rohc_decomp_enable_profile(rcouple->decompressor, ROHC_PROFILE_TCP)) {
+	if(!rohc_decomp_enable_profiles(rcouple->decompressor, 
+									ROHC_PROFILE_TCP, ROHC_PROFILE_IP, -1)) {
 		pr_info("failed to enable the TCP profile\n");
 		goto free_decomp;
 	}
