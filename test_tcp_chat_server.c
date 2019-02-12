@@ -81,7 +81,7 @@ int main(int argc, char const *argv[]){
 */
     read_cnt = fread((void*)sendBuf, 1, BUFFER_SIZE, fp);
     if(read_cnt < BUFFER_SIZE) {
-        write(new_socket, BUFFER_SIZE, read_cnt);
+        write(new_socket, sendBuf, read_cnt);
         break;
     }
     write(new_socket, sendBuf, BUFFER_SIZE);
