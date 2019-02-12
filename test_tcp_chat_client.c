@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]){
         else
             printf("Server: %s\n", rcvdBuf);
 */
-        read_cnt = read(sock, rcvdBuf, fp);
+        read_cnt = read(sock, rcvdBuf, BUFFER_SIZE);
         fwrite((void*)rcvdBuf, 1, read_cnt, fp);
     }
 
