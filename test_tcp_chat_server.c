@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]){
     int read_cnt;
     FILE *fp;
 
-    fp = fopen("Speech.mp3", "rb");
+    fp = fopen("hello.c", "rb");
     
     // Creating socket
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1){
