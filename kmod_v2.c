@@ -352,8 +352,7 @@ static int my_init(void) {
 }
 
 static int my_exit(void) {
-	my_comp_exit();
-	my_decomp_exit();
+    nf_unregister_net_hook(&init_net, &nfho);
 }
 /* Test module... select one */
 
