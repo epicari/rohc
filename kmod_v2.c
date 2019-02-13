@@ -344,15 +344,17 @@ static void my_decomp_exit(void) {
 }
 
 static int my_init(void) {
+
 	while(10){
 		my_comp();
 		my_decomp();
 	}
+
 	return 0;
 }
 
 static int my_exit(void) {
-    nf_unregister_net_hook(&init_net, &nfho);
+    my_comp_exit();
 }
 /* Test module... select one */
 
