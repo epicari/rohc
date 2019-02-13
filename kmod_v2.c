@@ -353,15 +353,12 @@ static int my_init(void) {
 	return 0;
 }
 
-static int my_exit(void) {
-    my_comp_exit();
-}
 /* Test module... select one */
 
 module_init(my_init);
 //module_init(my_decomp);
-module_exit(my_exit);
-//module_exit(my_decomp_exit);
+//module_exit(my_exit);
+module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
