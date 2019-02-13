@@ -312,12 +312,8 @@ static unsigned int hook_decomp (void *priv,
 }
 
 static int my_comp(void) {
-	while(10) {
-		nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-		nfho.hook = hook_comp;
-    	nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-		nfho.hook = hook_decomp;
-	}
+	nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfho.hook = hook_comp;
     nfho.pf = NFPROTO_IPV4;
     nfho.priority = NF_IP_PRI_FIRST;
 	nfho.priv = NULL;
@@ -347,13 +343,16 @@ static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
+static void my_loop(void) {
 
+	while(10) {
 	module_init(my_comp);
 	module_exit(my_comp_exit);
-/*
+
 	module_init(my_decomp);
 	module_exit(my_decomp_exit);
-*/
+	}
+}
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
