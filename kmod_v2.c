@@ -345,8 +345,9 @@ static void my_decomp_exit(void) {
 
 while (10) {
 	module_init(my_comp);
-	module_init(my_decomp);
 	module_exit(my_comp_exit);
+	
+	module_init(my_decomp);
 	module_exit(my_decomp_exit);
 }
 
