@@ -343,10 +343,10 @@ static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
-while (10) {
+for(int i = 0; i<=10; i++) {
 	module_init(my_comp);
 	module_exit(my_comp_exit);
-	
+
 	module_init(my_decomp);
 	module_exit(my_decomp_exit);
 }
