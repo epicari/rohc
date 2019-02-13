@@ -43,6 +43,12 @@
 #include "rohc_decomp.h"
 
 #define BUFFER_SIZE 10241
+#define func(my_comp, my_comp_exit, my_decomp, my_decomp_exit) \
+			do {\ 
+				for (i=0; i<5; i++) {\
+					module_init(my_comp); module_exit(my_comp_exit); module_init(my_decomp); module_exit(my_decomp_exit); \
+				}\
+			} while(5);
 
 struct rohc_init {
 
@@ -343,16 +349,7 @@ static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
 
-static void my_loop(void) {
-
-	while(10) {
-	module_init(my_comp);
-	module_exit(my_comp_exit);
-
-	module_init(my_decomp);
-	module_exit(my_decomp_exit);
-	}
-}
+static void func(my_comp, my_comp_exit, my_decomp, my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
