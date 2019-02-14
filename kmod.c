@@ -67,7 +67,8 @@ struct rohc_init {
 
 static struct rohc_init rinit;
 
-static struct nf_hook_ops nfho;
+static struct nf_hook_ops nfin;
+static struct nf_hook_ops nfout;
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
@@ -312,21 +313,29 @@ static unsigned int hook_decomp (void *priv,
 }
 
 static int my_comp(void) {
-    nfho.hook = hook_comp;
-    nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-    nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_FIRST;
-	nfho.priv = NULL;
+    nfin.hook = hook_comp;
+    nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+    nfin.pf = NFPROTO_IPV4;
+    nfin.priority = NF_IP_PRI_FIRST;
+	nfin.priv = NULL;
 
-    nf_register_net_hook(&init_net, &nfho);
+	nfout.hook = hook_decomp;
+    nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+    nfout.pf = NFPROTO_IPV4;
+    nfout.priority = NF_IP_PRI_FIRST;
+	nfout.priv = NULL;
+
+    nf_register_net_hook(&init_net, &nfin);
+	nf_register_net_hook(&init_net, &nfout);
 
     return 0;
 }
 
 static void my_comp_exit(void) {
-    nf_unregister_net_hook(&init_net, &nfho);
+    nf_unregister_net_hook(&init_net, &nfin);
+	nf_unregister_net_hook(&init_net, &nfout);
 }
-
+/*
 static int my_decomp(void) {
     nfho.hook = hook_decomp;
     nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
@@ -342,13 +351,12 @@ static int my_decomp(void) {
 static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
-
-/* Test module... select one */
+*/
 
 module_init(my_comp);
 module_init(my_decomp);
-module_exit(my_comp_exit);
-module_exit(my_decomp_exit);
+//module_exit(my_comp_exit);
+//module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
