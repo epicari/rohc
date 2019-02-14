@@ -354,8 +354,8 @@ static void my_decomp_exit(void) {
 */
 
 module_init(my_comp);
-module_init(my_decomp);
-//module_exit(my_comp_exit);
+//module_init(my_decomp);
+module_exit(my_comp_exit);
 //module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
