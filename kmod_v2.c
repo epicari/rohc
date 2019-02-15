@@ -43,14 +43,11 @@
 #include "rohc_decomp.h"
 
 #define BUFFER_SIZE 10241
-#define func(my_comp, my_comp_exit, my_decomp, my_decomp_exit) \
-			do {\ 
-				for (i=0; i<5; i++) {\
-					module_init(my_comp); module_exit(my_comp_exit); module_init(my_decomp); module_exit(my_decomp_exit); \
-				}\
-			} while(5);
 
 struct rohc_init {
+
+	struct iphdr *iph;
+	struct iphdr *ih;
 
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
@@ -73,7 +70,8 @@ struct rohc_init {
 
 static struct rohc_init rinit;
 
-static struct nf_hook_ops nfho;
+static struct nf_hook_ops nfin;
+static struct nf_hook_ops nfout;
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context);
@@ -274,21 +272,18 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 static unsigned int hook_comp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
-    
-    struct iphdr *iph;
-	struct iphdr *ih;
+  
+	rinit->iph = ip_hdr(skb);
+	rinit->ih = skb_header_pointer(skb, rinit->iph->frag_off, sizeof(rinit->iph), &iph);
 
-	iph = ip_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-
-	if (ih == NULL) {
+	if (rinit->ih == NULL) {
 		pr_info("TRUNCATED\n");
 		return NF_ACCEPT;
 	}
 
-	if (iph->protocol == IPPROTO_TCP) {
+	if (rinit->iph->protocol == IPPROTO_TCP) {
 
-		rohc_comp(&rinit, skb, ih);
+		rohc_comp(&rinit, skb, rinit->ih);
 	}
 
 	return NF_ACCEPT;
@@ -297,42 +292,47 @@ static unsigned int hook_comp (void *priv,
 static unsigned int hook_decomp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
-    
-    struct iphdr *iph;
-	struct iphdr *ih;
+  
+	rinit->iph = ip_hdr(skb);
+	rinit->ih = skb_header_pointer(skb, rinit->iph->frag_off, sizeof(rinit->iph), &iph);
 
-	iph = ip_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-
-	if (ih == NULL) {
+	if (rinit->ih == NULL) {
 		pr_info("TRUNCATED\n");
 		return NF_ACCEPT;
 	}
 
-	if (iph->protocol == IPPROTO_TCP) {
-	
-		rohc_decomp(&rinit, skb, ih);
+	if (rinit->iph->protocol == IPPROTO_TCP) {
+
+		rohc_decomp(&rinit, skb, rinit->ih);
 	}
 
 	return NF_ACCEPT;
 }
 
-static int my_comp(void) {
-	nfho.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-	nfho.hook = hook_comp;
-    nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_FIRST;
-	nfho.priv = NULL;
 
-    nf_register_net_hook(&init_net, &nfho);
+static int my_comp(void) {
+    nfin.hook = hook_comp;
+    nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+    nfin.pf = PF_INET;
+    nfin.priority = NF_IP_PRI_LAST;
+	nfin.priv = NULL;
+	nf_register_net_hook(&init_net, &nfin);
+
+	nfout.hook = hook_decomp;
+    nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+    nfout.pf = PF_INET;
+    nfout.priority = NF_IP_PRI_FIRST;
+	nfout.priv = NULL;
+	nf_register_net_hook(&init_net, &nfout);
 
     return 0;
 }
 
 static void my_comp_exit(void) {
-    nf_unregister_net_hook(&init_net, &nfho);
+    nf_unregister_net_hook(&init_net, &nfin);
+	nf_unregister_net_hook(&init_net, &nfout);
 }
-
+/*
 static int my_decomp(void) {
     nfho.hook = hook_decomp;
     nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
@@ -348,8 +348,12 @@ static int my_decomp(void) {
 static void my_decomp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfho);
 }
+*/
 
-static void func(my_comp, my_comp_exit, my_decomp, my_decomp_exit);
+module_init(my_comp);
+//module_init(my_decomp);
+module_exit(my_comp_exit);
+//module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");

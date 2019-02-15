@@ -315,17 +315,16 @@ static unsigned int hook_decomp (void *priv,
 static int my_comp(void) {
     nfin.hook = hook_comp;
     nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-    nfin.pf = NFPROTO_IPV4;
-    nfin.priority = NF_IP_PRI_FIRST;
+    nfin.pf = PF_INET;
+    nfin.priority = NF_IP_PRI_LAST;
 	nfin.priv = NULL;
+	nf_register_net_hook(&init_net, &nfin);
 
 	nfout.hook = hook_decomp;
     nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-    nfout.pf = NFPROTO_IPV4;
+    nfout.pf = PF_INET;
     nfout.priority = NF_IP_PRI_FIRST;
 	nfout.priv = NULL;
-
-    nf_register_net_hook(&init_net, &nfin);
 	nf_register_net_hook(&init_net, &nfout);
 
     return 0;
