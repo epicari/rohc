@@ -278,14 +278,9 @@ static unsigned int hook_comp (void *priv,
 
 	if (iph->protocol == IPPROTO_TCP) {
 
-		int ret;
-
 		if (tph) {
 
-			ret = rohc_my_comp(&rinit, skb, ih);
-
-			if (ret == 1)
-				return NF_DROP;	
+			rohc_my_comp(&rinit, skb, ih);
 		}		
 		else
 			return NF_ACCEPT;
@@ -308,14 +303,9 @@ static unsigned int hook_decomp (void *priv,
 
 	if (iph->protocol == IPPROTO_TCP) {
 
-		int ret;
-
 		if (tph) {
 
-			ret = rohc_my_decomp(&rinit, skb, ih);
-
-			if (ret == 1)
-				return NF_DROP;	
+			rohc_my_decomp(&rinit, skb, ih);
 		}
 		else
 			return NF_ACCEPT;
