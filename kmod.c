@@ -286,9 +286,7 @@ static unsigned int hook_comp (void *priv,
 			ret = rohc_my_comp(&rinit, skb, ih);
 
 			if (ret == 1)
-				return NF_DROP;
-			else
-				return NF_ACCEPT;	
+				return NF_ACCEPT;
 		}		
 		else
 			return NF_ACCEPT;
@@ -318,8 +316,6 @@ static unsigned int hook_decomp (void *priv,
 			ret = rohc_my_decomp(&rinit, skb, ih);
 
 			if (ret == 1)
-				return NF_DROP;
-			else
 				return NF_ACCEPT;
 		}
 		else
@@ -343,7 +339,7 @@ static int my_comp(void) {
     //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
 	nfout.hooknum = NF_INET_LOCAL_IN;
     nfout.pf = PF_INET;
-    nfout.priority = NF_IP_PRI_FIRST;
+    nfout.priority = NF_IP_PRI_LAST;
 	nfout.priv = NULL;
 	nf_register_net_hook(&init_net, &nfout);
 
