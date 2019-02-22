@@ -87,7 +87,7 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
-int rohc_comp(struct rohc_init *rcouple,
+int rohc_my_comp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
 
@@ -124,12 +124,12 @@ int rohc_comp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
 	}
-	
+/*	
 	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
-
+*/
 	if(!rohc_comp_enable_profiles(rcouple->compressor,
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -180,7 +180,7 @@ free_comp:
 	return 1;
 }
 
-int rohc_decomp(struct rohc_init *rcouple,
+int rohc_my_decomp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
 
@@ -214,12 +214,12 @@ int rohc_decomp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_decomp;
 	}
-	
+/*	
 	if(!rohc_decomp_set_features(rcouple->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_decomp;
 	}
-
+*/
 	if(!rohc_decomp_enable_profiles(rcouple->decompressor, 
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -283,7 +283,7 @@ static unsigned int hook_comp (void *priv,
 
 		if (tph) {
 
-			ret = rohc_comp(&rinit, skb, ih);
+			ret = rohc_my_comp(&rinit, skb, ih);
 
 			if (ret == 1)
 				return NF_DROP;
@@ -315,7 +315,7 @@ static unsigned int hook_decomp (void *priv,
 
 		if (tph) {
 
-			ret = rohc_decomp(&rinit, skb, ih);
+			ret = rohc_my_decomp(&rinit, skb, ih);
 
 			if (ret == 1)
 				return NF_DROP;
