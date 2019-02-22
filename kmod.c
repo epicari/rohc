@@ -124,12 +124,12 @@ int rohc_my_comp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
 	}
-	
+/*	
 	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
-
+*/
 	if(!rohc_comp_enable_profiles(rcouple->compressor,
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -167,7 +167,7 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	return 0;
+	return NF_ACCEPT;
 
 free_pkt_out:
 	kfree(rcouple->rohc_packet_out);
@@ -214,12 +214,12 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_decomp;
 	}
-
+/*
 	if(!rohc_decomp_set_features(rcouple->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_decomp;
 	}
-
+*/
 	if(!rohc_decomp_enable_profiles(rcouple->decompressor, 
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -249,7 +249,7 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
-	return 0;
+	return NF_ACCEPT;
 
 free_pkt_in:
 	kfree(rcouple->rohc_packet_in);
@@ -285,10 +285,7 @@ static unsigned int hook_comp (void *priv,
 			ret = rohc_my_comp(&rinit, skb, ih);
 
 			if (ret == 1)
-				return NF_ACCEPT;
-			else
-				pr_info("Compression\n");
-				return NF_ACCEPT;			
+				return NF_DROP;	
 		}		
 		else
 			return NF_ACCEPT;
@@ -318,10 +315,7 @@ static unsigned int hook_decomp (void *priv,
 			ret = rohc_my_decomp(&rinit, skb, ih);
 
 			if (ret == 1)
-				return NF_ACCEPT;
-			else
-				pr_info("Decompression\n");
-				return NF_ACCEPT;	
+				return NF_DROP;	
 		}
 		else
 			return NF_ACCEPT;
