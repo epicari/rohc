@@ -298,6 +298,10 @@ int rohc_decomp(struct rohc_init *rcouple,
 													ntohs(ih->tot_len), 0);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 
+	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
+														BUFFER_SIZE);
+	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+
 	rohc_status_t status;
 
 	rcouple->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
