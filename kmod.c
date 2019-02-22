@@ -298,7 +298,6 @@ static unsigned int hook_comp (void *priv,
 	else
 		return NF_ACCEPT;		
 }
-}
 
 static unsigned int hook_decomp (void *priv,
                         struct sk_buff *skb,
