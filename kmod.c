@@ -97,7 +97,7 @@ int rohc_comp(struct rohc_init *rcouple,
 
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rohc_packet_out == NULL)
-		goto free_comp;
+		goto free_pkt_out;
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rcvd_feedback_buf == NULL)
 		goto free_rcvd_feedback;
@@ -167,7 +167,7 @@ int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	return NF_ACCEPT;
+	return 0;
 
 free_pkt_out:
 	kfree(rcouple->rohc_packet_out);
@@ -177,7 +177,7 @@ free_feedback_send:
 	kfree(rcouple->feedback_to_send_buf);
 free_comp:
 	rohc_comp_free(rcouple->compressor);
-	return 0;
+	return 1;
 }
 
 int rohc_decomp(struct rohc_init *rcouple,
@@ -250,14 +250,13 @@ int rohc_decomp(struct rohc_init *rcouple,
 		goto free_decomp;
 	}
 
-	return NF_ACCEPT;
+	return 0;
 
 free_pkt_in:
 	kfree(rcouple->rohc_packet_in);
-
 free_decomp:
 	rohc_decomp_free(rcouple->decompressor);
-	return 0;
+	return 1;
 
 }
 
@@ -279,11 +278,16 @@ static unsigned int hook_comp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
-
-		if (tph)
-			rohc_comp(&rinit, skb, ih);
+		int ret;
+		if (tph) {
+			ret = rohc_comp(&rinit, skb, ih);
+			if (ret == 1)
+				return NF_DROP;
+			else
+				return NF_ACCEPT;			
 		else
 			return NF_ACCEPT;
+		}
 	}
 	else
 		return NF_ACCEPT;		
@@ -302,11 +306,16 @@ static unsigned int hook_decomp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
-
-		if (tph)
-			rohc_decomp(&rinit, skb, ih);
+		int ret;
+		if (tph) {
+			ret = rohc_decomp(&rinit, skb, ih);
+			if (ret == 1)
+				return NF_DROP;
+			else
+				return NF_ACCEPT;
 		else
 			return NF_ACCEPT;
+		}
 	}
 	else
 		return NF_ACCEPT;		
