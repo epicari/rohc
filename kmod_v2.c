@@ -20,8 +20,8 @@
  */
 
 /**
- * @file   kmod_netfilter
- * @brief  Export the ROHC library to the Linux kernel
+ * @file   kmod
+ * @brief  Export the ROHC library to the Linux kernel with netfilter
  * @author Suho CHOI <aiek261247@gmail.com>
  */
 
@@ -45,9 +45,6 @@
 #define BUFFER_SIZE 10241
 
 struct rohc_init {
-
-	struct iphdr *iph;
-	struct iphdr *ih;
 
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
@@ -89,7 +86,7 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	vprintk(format, args);
 	va_end(args);
 }
-
+/*
 int rohc_comp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
@@ -182,7 +179,8 @@ free_comp:
 	rohc_comp_free(rcouple->compressor);
 	return 0;
 }
-
+*/
+/*
 int rohc_decomp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
@@ -263,6 +261,60 @@ free_decomp:
 	return 0;
 
 }
+*/
+
+int rohc_comp(struct rohc_init *rcouple,
+			struct sk_buff *skb,
+			struct iphdr *ih) {
+	
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+
+	rohc_status_t status;
+
+	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+								gen_false_random_num, NULL);
+	
+	if(compressor == NULL)
+		pr_info("failed\n");
+
+	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
+	
+	if (status == ROHC_STATUS_OK)
+		pr_info("ROHC Compression\n");
+
+	pr_info("destroy the ROHC comp\n");
+	rohc_comp_free(rcouple->compressor);
+	
+	return NF_ACCEPT;
+
+}
+
+int rohc_decomp(struct rohc_init *rcouple,
+				struct sk_buff *skb,
+				struct iphdr *ih) {
+
+	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
+													ntohs(ih->tot_len), 0);
+	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
+
+	rohc_status_t status;
+
+	rcouple->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
+											ROHC_O_MODE);
+
+	status = rohc_decompress3(rcouple->decompressor, rohc_packet, &ip_packet, 
+							&rcvd_feedback, feedback_to_send);
+
+	if(status == ROHC_STATUS_OK)
+		pr_info("ROHC Decompression\n");
+
+	pr_info("destroy the ROHC decomp\n");
+	rohc_decomp_free(rcouple->decompressor);
+
+	return NF_ACCEPT;
+}
+
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
 								void *const user_context) {
@@ -272,54 +324,61 @@ static int gen_false_random_num(const struct rohc_comp *const comp,
 static unsigned int hook_comp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
-  
-	rinit->iph = ip_hdr(skb);
-	rinit->ih = skb_header_pointer(skb, rinit->iph->frag_off, sizeof(rinit->iph), &iph);
+    
+    struct iphdr *iph;
+	struct tcphdr *tph;
+	struct iphdr *ih;
 
-	if (rinit->ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_ACCEPT;
+	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+
+	if (iph->protocol == IPPROTO_TCP) {
+
+		if (tph)
+			rohc_comp(&rinit, skb, ih);
+		else
+			return NF_ACCEPT;
 	}
-
-	if (rinit->iph->protocol == IPPROTO_TCP) {
-
-		rohc_comp(&rinit, skb, rinit->ih);
-	}
-
-	return NF_ACCEPT;
+	else
+		return NF_ACCEPT;		
 }
 
 static unsigned int hook_decomp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
-  
-	rinit->iph = ip_hdr(skb);
-	rinit->ih = skb_header_pointer(skb, rinit->iph->frag_off, sizeof(rinit->iph), &iph);
+    
+    struct iphdr *iph;
+	struct tcphdr *tph;
+	struct iphdr *ih;
 
-	if (rinit->ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_ACCEPT;
+	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+
+	if (iph->protocol == IPPROTO_TCP) {
+
+		if (tph)
+			rohc_decomp(&rinit, skb, ih);
+		else
+			return NF_ACCEPT;
 	}
-
-	if (rinit->iph->protocol == IPPROTO_TCP) {
-
-		rohc_decomp(&rinit, skb, rinit->ih);
-	}
-
-	return NF_ACCEPT;
+	else
+		return NF_ACCEPT;		
 }
-
 
 static int my_comp(void) {
     nfin.hook = hook_comp;
-    nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+    //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfin.hooknum = NF_INET_LOCAL_OUT;
     nfin.pf = PF_INET;
-    nfin.priority = NF_IP_PRI_LAST;
+    nfin.priority = NF_IP_PRI_FIRST;
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
 	nfout.hook = hook_decomp;
-    nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+    //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+	nfout.hooknum = NF_INET_LOCAL_IN;
     nfout.pf = PF_INET;
     nfout.priority = NF_IP_PRI_FIRST;
 	nfout.priv = NULL;
@@ -332,28 +391,9 @@ static void my_comp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfin);
 	nf_unregister_net_hook(&init_net, &nfout);
 }
-/*
-static int my_decomp(void) {
-    nfho.hook = hook_decomp;
-    nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-    nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_FIRST;
-	nfho.priv = NULL;
-
-    nf_register_net_hook(&init_net, &nfho);
-
-    return 0;
-}
-
-static void my_decomp_exit(void) {
-    nf_unregister_net_hook(&init_net, &nfho);
-}
-*/
 
 module_init(my_comp);
-//module_init(my_decomp);
 module_exit(my_comp_exit);
-//module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");

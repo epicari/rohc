@@ -277,17 +277,7 @@ static unsigned int hook_comp (void *priv,
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-/*
-	if (ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_ACCEPT;
-	}
 
-	if (iph->protocol == IPPROTO_TCP) {
-
-		rohc_comp(&rinit, skb, ih);
-	}
-*/
 	if (iph->protocol == IPPROTO_TCP) {
 
 		if (tph)
@@ -310,17 +300,7 @@ static unsigned int hook_decomp (void *priv,
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
-/*
-	if (ih == NULL) {
-		pr_info("TRUNCATED\n");
-		return NF_ACCEPT;
-	}
 
-	if (iph->protocol == IPPROTO_TCP) {
-	
-		rohc_decomp(&rinit, skb, ih);
-	}
-*/
 	if (iph->protocol == IPPROTO_TCP) {
 
 		if (tph)
