@@ -20,8 +20,8 @@
  */
 
 /**
- * @file   kmod_netfilter
- * @brief  Export the ROHC library to the Linux kernel
+ * @file   kmod
+ * @brief  Export the ROHC library to the Linux kernel with netfilter
  * @author Suho CHOI <aiek261247@gmail.com>
  */
 
@@ -280,13 +280,14 @@ static unsigned int hook_comp (void *priv,
 		pr_info("TRUNCATED\n");
 		return NF_ACCEPT;
 	}
-
+/*
 	if (iph->protocol == IPPROTO_TCP) {
 
 		rohc_comp(&rinit, skb, ih);
 	}
+*/
+	rohc_comp(&rinit, skb, ih);
 
-	return NF_ACCEPT;
 }
 
 static unsigned int hook_decomp (void *priv,
@@ -303,13 +304,13 @@ static unsigned int hook_decomp (void *priv,
 		pr_info("TRUNCATED\n");
 		return NF_ACCEPT;
 	}
-
+/*
 	if (iph->protocol == IPPROTO_TCP) {
 	
 		rohc_decomp(&rinit, skb, ih);
 	}
-
-	return NF_ACCEPT;
+*/
+	rohc_decomp(&rinit, skb, ih);
 }
 
 static int my_comp(void) {
@@ -317,7 +318,7 @@ static int my_comp(void) {
     //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
 	nfin.hooknum = NF_INET_LOCAL_OUT;
     nfin.pf = PF_INET;
-    nfin.priority = NF_IP_PRI_LAST;
+    nfin.priority = NF_IP_PRI_FIRST;
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
@@ -336,28 +337,9 @@ static void my_comp_exit(void) {
     nf_unregister_net_hook(&init_net, &nfin);
 	nf_unregister_net_hook(&init_net, &nfout);
 }
-/*
-static int my_decomp(void) {
-    nfho.hook = hook_decomp;
-    nfho.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-    nfho.pf = NFPROTO_IPV4;
-    nfho.priority = NF_IP_PRI_FIRST;
-	nfho.priv = NULL;
-
-    nf_register_net_hook(&init_net, &nfho);
-
-    return 0;
-}
-
-static void my_decomp_exit(void) {
-    nf_unregister_net_hook(&init_net, &nfho);
-}
-*/
 
 module_init(my_comp);
-//module_init(my_decomp);
 module_exit(my_comp_exit);
-//module_exit(my_decomp_exit);
 
 MODULE_VERSION(PACKAGE_VERSION PACKAGE_REVNO);
 MODULE_LICENSE("GPL");
