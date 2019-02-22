@@ -275,8 +275,10 @@ int rohc_comp(struct rohc_init *rcouple,
 	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 								gen_false_random_num, NULL);
 	
-	if(compressor == NULL)
+	if(rcouple->compressor == NULL) {
 		pr_info("failed\n");
+		return NF_ACCEPT;
+	}
 
 	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
 	
@@ -306,7 +308,11 @@ int rohc_decomp(struct rohc_init *rcouple,
 
 	rcouple->decompressor = rohc_decomp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 											ROHC_O_MODE);
-
+	
+	if(rcouple->decompressor == NULL) {
+		pr_info("failed\n");
+		return NF_ACCEPT;
+	}
 	status = rohc_decompress3(rcouple->decompressor, rohc_packet, &ip_packet, 
 							&rcvd_feedback, feedback_to_send);
 
