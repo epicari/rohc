@@ -271,9 +271,11 @@ static unsigned int hook_comp (void *priv,
                         const struct nf_hook_state *state) {
     
     struct iphdr *iph;
+	struct tcphdr *tph;
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 /*
 	if (ih == NULL) {
@@ -286,8 +288,10 @@ static unsigned int hook_comp (void *priv,
 		rohc_comp(&rinit, skb, ih);
 	}
 */
-	rohc_comp(&rinit, skb, ih);
-
+	if (tph)
+		rohc_comp(&rinit, skb, ih);
+	else
+		return NF_ACCEPT;
 }
 
 static unsigned int hook_decomp (void *priv,
@@ -295,9 +299,11 @@ static unsigned int hook_decomp (void *priv,
                         const struct nf_hook_state *state) {
     
     struct iphdr *iph;
+	struct tcphdr *tph;
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
+	tph = tcp_hdr(skb);
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 /*
 	if (ih == NULL) {
@@ -310,21 +316,24 @@ static unsigned int hook_decomp (void *priv,
 		rohc_decomp(&rinit, skb, ih);
 	}
 */
-	rohc_decomp(&rinit, skb, ih);
+	if (tph)
+		rohc_decomp(&rinit, skb, ih);
+	else
+		return NF_ACCEPT;	
 }
 
 static int my_comp(void) {
     nfin.hook = hook_comp;
-    nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-	//nfin.hooknum = NF_INET_LOCAL_OUT;
+    //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfin.hooknum = NF_INET_LOCAL_OUT;
     nfin.pf = PF_INET;
     nfin.priority = NF_IP_PRI_FIRST;
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
 	nfout.hook = hook_decomp;
-    nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-	//nfout.hooknum = NF_INET_LOCAL_IN;
+    //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+	nfout.hooknum = NF_INET_LOCAL_IN;
     nfout.pf = PF_INET;
     nfout.priority = NF_IP_PRI_FIRST;
 	nfout.priv = NULL;
