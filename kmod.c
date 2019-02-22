@@ -278,16 +278,20 @@ static unsigned int hook_comp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
+
 		int ret;
+
 		if (tph) {
+
 			ret = rohc_comp(&rinit, skb, ih);
+
 			if (ret == 1)
 				return NF_DROP;
 			else
-				return NF_ACCEPT;			
+				return NF_ACCEPT;	
+		}		
 		else
 			return NF_ACCEPT;
-		}
 	}
 	else
 		return NF_ACCEPT;		
@@ -306,17 +310,22 @@ static unsigned int hook_decomp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
+
 		int ret;
+
 		if (tph) {
+
 			ret = rohc_decomp(&rinit, skb, ih);
+
 			if (ret == 1)
 				return NF_DROP;
 			else
 				return NF_ACCEPT;
+		}
 		else
 			return NF_ACCEPT;
-		}
 	}
+
 	else
 		return NF_ACCEPT;		
 }
