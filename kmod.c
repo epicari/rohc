@@ -243,7 +243,6 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 	}
 
 	rcouple->ip_out_size = ip_packet.len;
-	pr_info("Decompression Packet len = %u", rcouple->ip_out_size);
 
 	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
@@ -286,7 +285,7 @@ static unsigned int hook_comp (void *priv,
 			ret = rohc_my_comp(&rinit, skb, ih);
 
 			if (ret == 1)
-				return NF_ACCEPT;
+				return NF_ACCEPT;			
 		}		
 		else
 			return NF_ACCEPT;
