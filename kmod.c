@@ -284,8 +284,6 @@ static unsigned int hook_comp (void *priv,
 		}		
 		else
 			return NF_ACCEPT;
-
-		return NF_ACCEPT;
 	}
 
 	return NF_ACCEPT;		
@@ -310,11 +308,9 @@ static unsigned int hook_decomp (void *priv,
 			rohc_my_decomp(&rinit, skb, ih);
 		}
 		else
-			return NF_ACCEPT;
-		
-		return NF_ACCEPT;
+			return NF_ACCEPT;		
 	}
-	
+
 	return NF_ACCEPT;	
 }
 
