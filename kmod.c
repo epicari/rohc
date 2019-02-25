@@ -93,7 +93,7 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP_INIT\n");
 
-	//memset(rcouple, 0, sizeof(struct rohc_init));
+	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rohc_packet_out == NULL)
@@ -186,9 +186,15 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 
+	memset(rcouple, 0, sizeof(struct rohc_init));
+
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rohc_packet_in == NULL)
 		goto free_pkt_in;
+	
+	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	if(rcouple->rcvd_feedback_buf == NULL)
+		goto free_rcvd_feedback;
 	
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													ntohs(ih->tot_len), 0);
@@ -253,6 +259,8 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 free_pkt_in:
 	kfree(rcouple->rohc_packet_in);
+free_rcvd_feedback:
+	kfree(rcouple->rcvd_feedback_buf);
 free_decomp:
 	rohc_decomp_free(rcouple->decompressor);
 	return 1;
