@@ -276,6 +276,7 @@ static unsigned int hook_comp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
     
+	int rts;
     struct iphdr *iph;
 	struct tcphdr *tph;
 	struct iphdr *ih;
@@ -288,7 +289,12 @@ static unsigned int hook_comp (void *priv,
 
 		if (tph) {
 
-			rohc_my_comp(&rinit, skb, ih);
+			rts = rohc_my_comp(&rinit, skb, ih);
+
+			if (rts == 0)
+				return NF_ACCEPT;
+			else
+				return NF_DROP;
 		}		
 		else
 			return NF_ACCEPT;
@@ -301,7 +307,8 @@ static unsigned int hook_decomp (void *priv,
                         struct sk_buff *skb,
                         const struct nf_hook_state *state) {
     
-    struct iphdr *iph;
+    int rts;
+	struct iphdr *iph;
 	struct tcphdr *tph;
 	struct iphdr *ih;
 
@@ -313,7 +320,13 @@ static unsigned int hook_decomp (void *priv,
 
 		if (tph) {
 
-			rohc_my_decomp(&rinit, skb, ih);
+			rts = rohc_my_decomp(&rinit, skb, ih);
+
+			if (rts == 0)
+				return NF_ACCEPT;
+
+			else
+				return NF_DROP;
 		}
 		else
 			return NF_ACCEPT;		
