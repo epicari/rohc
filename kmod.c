@@ -284,9 +284,11 @@ static unsigned int hook_comp (void *priv,
 		}		
 		else
 			return NF_ACCEPT;
+
+		return NF_ACCEPT;
 	}
-	else
-		return NF_ACCEPT;		
+
+	return NF_ACCEPT;		
 }
 
 static unsigned int hook_decomp (void *priv,
@@ -309,10 +311,11 @@ static unsigned int hook_decomp (void *priv,
 		}
 		else
 			return NF_ACCEPT;
+		
+		return NF_ACCEPT;
 	}
-
-	else
-		return NF_ACCEPT;		
+	
+	return NF_ACCEPT;	
 }
 
 static int my_comp(void) {
@@ -320,7 +323,7 @@ static int my_comp(void) {
     //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
 	nfin.hooknum = NF_INET_LOCAL_OUT;
     nfin.pf = PF_INET;
-    nfin.priority = NF_IP_PRI_FIRST;
+    nfin.priority = NF_IP_PRI_LAST;
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
@@ -328,7 +331,7 @@ static int my_comp(void) {
     //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
 	nfout.hooknum = NF_INET_LOCAL_IN;
     nfout.pf = PF_INET;
-    nfout.priority = NF_IP_PRI_FIRST;
+    nfout.priority = NF_IP_PRI_LAST;
 	nfout.priv = NULL;
 	nf_register_net_hook(&init_net, &nfout);
 
