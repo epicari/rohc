@@ -98,15 +98,14 @@ int rohc_my_comp(struct rohc_init *rcouple,
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->rohc_packet_out == NULL)
 		goto free_pkt_out;
-	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	if(rcouple->rcvd_feedback_buf == NULL)
-		goto free_rcvd_feedback;
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	if(rcouple->feedback_to_send_buf == NULL)
 		goto free_feedback_send;
 
+	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
+										.nsec = skb->skb_get_timestampns };
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), 0);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
 
 	rohc_status_t status;
 
@@ -171,8 +170,6 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 free_pkt_out:
 	kfree(rcouple->rohc_packet_out);
-free_rcvd_feedback:
-	kfree(rcouple->rcvd_feedback_buf);
 free_feedback_send:
 	kfree(rcouple->feedback_to_send_buf);
 free_comp:
@@ -196,8 +193,10 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 	if(rcouple->rcvd_feedback_buf == NULL)
 		goto free_rcvd_feedback;
 	
+	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
+										.nsec = skb->skb_get_timestampns };
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-													ntohs(ih->tot_len), 0);
+													ntohs(ih->tot_len), arrival_time);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);

@@ -68,7 +68,16 @@ static unsigned int hook_func_o (void *priv,
 
     return NF_ACCEPT;
 }
+
+static int testfuc (void) {
+	pr_info("test case\n");
+	return 0;
+}
+
 static int my_init(void) {
+
+	testfuc();
+
     nfhi.hook = hook_func_i;
     nfhi.hooknum = NF_INET_LOCAL_IN;
     nfhi.pf = NFPROTO_IPV4;
