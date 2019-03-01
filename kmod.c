@@ -110,14 +110,15 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP_INIT\n");
 
-	const struct rohc_ts arrival_time = { .sec = 0 , 
-										.nsec = 0 };
+	const struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
 
 	rohc_status_t status;
 
 	rcouple->rohc_out_size = 0;
+
+	pr_info("rohc_comp_new2\n");
 
 	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
