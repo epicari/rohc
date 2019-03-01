@@ -110,8 +110,8 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP_INIT\n");
 
-	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
-										.nsec = skb->skb_get_timestampns };
+	const struct rohc_ts arrival_time = { .sec = skb->tstamp.off_sec, 
+										.nsec = skb->tstamp.off_usec };
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
 
@@ -187,8 +187,8 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 
-	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
-										.nsec = skb->skb_get_timestampns };
+	const struct rohc_ts arrival_time = { .sec = skb->tstamp.off_sec, 
+										.nsec = skb->tstamp.off_usec };
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													ntohs(ih->tot_len), arrival_time);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
@@ -327,7 +327,7 @@ static unsigned int hook_decomp (void *priv,
 static int my_comp(void) {
 
 	rohc_release(&rinit);
-	
+
     nfin.hook = hook_comp;
     //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
 	nfin.hooknum = NF_INET_LOCAL_OUT;
