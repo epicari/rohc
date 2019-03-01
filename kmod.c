@@ -36,7 +36,6 @@
 #include <linux/tcp.h>
 #include <linux/uaccess.h>
 #include <linux/proc_fs.h>
-#include <linux/ktime.h>
 
 #include "config.h"
 #include "rohc.h"
