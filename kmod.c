@@ -36,6 +36,7 @@
 #include <linux/tcp.h>
 #include <linux/uaccess.h>
 #include <linux/proc_fs.h>
+#include <linux/ktime.h>
 
 #include "config.h"
 #include "rohc.h"
@@ -110,8 +111,8 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP_INIT\n");
 
-	const struct rohc_ts arrival_time = { .sec = skb->tstamp.off_sec, 
-										.nsec = skb->tstamp.off_usec };
+	const struct rohc_ts arrival_time = { .sec = ktime_to_timeval(skb->tstamp), 
+										.nsec = ktime_to_timespec(skb->tstamp) };
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
 
@@ -187,8 +188,8 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 
-	const struct rohc_ts arrival_time = { .sec = skb->tstamp.off_sec, 
-										.nsec = skb->tstamp.off_usec };
+	const struct rohc_ts arrival_time = { .sec = ktime_to_timeval(skb->tstamp), 
+										.nsec = ktime_to_timespec(skb->tstamp) };
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													ntohs(ih->tot_len), arrival_time);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
