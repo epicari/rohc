@@ -87,20 +87,28 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
+static int rohc_release(struct rohc_init *rcouple) {
+	
+	pr_info("ROHC_RELEASE\n");
+
+	memset(rcouple, 0, sizeof(struct rohc_init));
+
+	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
+	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
+	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
+	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+
+	return 0;
+}
+
 int rohc_my_comp(struct rohc_init *rcouple,
 				struct sk_buff *skb,
 				struct iphdr *ih) {
 
 	pr_info("ROHC_COMP_INIT\n");
-
-	memset(rcouple, 0, sizeof(struct rohc_init));
-
-	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	if(rcouple->rohc_packet_out == NULL)
-		goto free_pkt_out;
-	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	if(rcouple->feedback_to_send_buf == NULL)
-		goto free_feedback_send;
 
 	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
 										.nsec = skb->skb_get_timestampns };
@@ -123,12 +131,12 @@ int rohc_my_comp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
 	}
-/*
+
 	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
-*/
+
 	if(!rohc_comp_enable_profiles(rcouple->compressor,
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -168,10 +176,6 @@ int rohc_my_comp(struct rohc_init *rcouple,
 
 	return NF_ACCEPT;
 
-free_pkt_out:
-	kfree(rcouple->rohc_packet_out);
-free_feedback_send:
-	kfree(rcouple->feedback_to_send_buf);
 free_comp:
 	rohc_comp_free(rcouple->compressor);
 	return 1;
@@ -183,16 +187,6 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP_INIT\n");
 
-	memset(rcouple, 0, sizeof(struct rohc_init));
-
-	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	if(rcouple->rohc_packet_in == NULL)
-		goto free_pkt_in;
-	
-	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	if(rcouple->rcvd_feedback_buf == NULL)
-		goto free_rcvd_feedback;
-	
 	const struct rohc_ts arrival_time = { .sec = skb->skb_get_timestamp, 
 										.nsec = skb->skb_get_timestampns };
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
@@ -219,12 +213,12 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_decomp;
 	}
-/*
+
 	if(!rohc_decomp_set_features(rcouple->decompressor, ROHC_DECOMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_decomp;
 	}
-*/
+
 	if(!rohc_decomp_enable_profiles(rcouple->decompressor, 
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
 			ROHC_PROFILE_UDP, ROHC_PROFILE_ESP, ROHC_PROFILE_IP,
@@ -256,10 +250,6 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 
 	return NF_ACCEPT;
 
-free_pkt_in:
-	kfree(rcouple->rohc_packet_in);
-free_rcvd_feedback:
-	kfree(rcouple->rcvd_feedback_buf);
 free_decomp:
 	rohc_decomp_free(rcouple->decompressor);
 	return 1;
@@ -335,6 +325,9 @@ static unsigned int hook_decomp (void *priv,
 }
 
 static int my_comp(void) {
+
+	rohc_release(&rinit);
+	
     nfin.hook = hook_comp;
     //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
 	nfin.hooknum = NF_INET_LOCAL_OUT;
