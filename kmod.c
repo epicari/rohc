@@ -55,9 +55,6 @@ struct rohc_init {
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
 
-	unsigned char *ip_pkt_out; // decomp IP packet
-	unsigned char *ip_pkt_in; // comp IP packet
-
 	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
 
 	size_t rohc_out_size; // comp ROHC packet

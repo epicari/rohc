@@ -105,6 +105,11 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 
 	pr_info("ROHC_RELEASE_INIT\n");
 
+	rcouple->rohc_packet_in = NULL;
+	rcouple->rohc_packet_out = NULL;
+	rcouple->feedback_to_send_buf = NULL;
+	rcouple->rcvd_feedback_buf = NULL;
+
 	kfree(rcouple->rohc_packet_in);
 	kfree(rcouple->rohc_packet_out);
 	kfree(rcouple->feedback_to_send_buf);
@@ -137,7 +142,7 @@ static int rohc_my_comp(struct rohc_init *rcouple,
 
 	if (rcouple->compressor == NULL) {
 		pr_info("failed create the ROHC compressor\n");
-		goto free_comp;
+		goto comp_error;
 	}
 
 	if(!rohc_comp_set_traces_cb2(rcouple->compressor, rohc_print_traces, NULL)) {
@@ -172,12 +177,9 @@ static int rohc_my_comp(struct rohc_init *rcouple,
 
 	status = rohc_compress4(rcouple->compressor, ip_packet, &rohc_packet);
 
-	if (status == ROHC_STATUS_OK) {
-		pr_info("ROHC Compression\n");
-	}
-	else {
-		pr_info("Compression failed\n");
-		goto free_comp;
+	if (status != ROHC_STATUS_OK) {
+		pr_info("failed to compress\n");
+		goto comp_error;
 	}
 
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
@@ -187,10 +189,13 @@ static int rohc_my_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
+	rohc_comp_free(rcouple->compressor);
+
 	return 0;
 
 free_comp:
 	rohc_comp_free(rcouple->compressor);
+comp_error:
 	return 1;
 }
 
@@ -213,13 +218,13 @@ static unsigned int hook_comp (void *priv,
 	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
-
+		pr_info("IP protocol TCP\n");
 		rts = rohc_my_comp(&rinit, skb, ih);
 
 		if (rts == 0)
 			return NF_ACCEPT;
 		else
-			return NF_DROP;		
+			return NF_ACCEPT;
 	}
 
 	return NF_ACCEPT;		
