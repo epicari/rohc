@@ -210,24 +210,25 @@ static unsigned int hook_comp (void *priv,
     
 	int rts;
     struct iphdr *iph;
-	struct tcphdr *tph;
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
-	tph = tcp_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
+	ih = skb_header_pointer(skb, iph->frag_off, iph->tot_len, &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
+
 		pr_info("IP protocol TCP\n");
+
 		rts = rohc_my_comp(&rinit, skb, ih);
 
 		if (rts == 0)
 			return NF_ACCEPT;
 		else
-			return NF_ACCEPT;
+			return NF_DROP;
 	}
 
-	return NF_ACCEPT;		
+	return NF_ACCEPT;
+	
 }
 
 
