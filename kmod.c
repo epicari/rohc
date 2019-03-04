@@ -87,7 +87,7 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 	va_end(args);
 }
 
-static int rohc_release(struct rohc_init *rcouple) {
+int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
@@ -101,7 +101,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 	return 0;
 }
 
-static int rohc_release_init(struct rohc_init *rcouple) {
+int rohc_release_init(struct rohc_init *rcouple) {
 
 	pr_info("ROHC_RELEASE_INIT\n");
 
