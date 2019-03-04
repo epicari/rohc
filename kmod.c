@@ -94,14 +94,24 @@ static int rohc_release(struct rohc_init *rcouple) {
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	return 0;
+}
+
+static int rohc_release_init(struct rohc_init *rcouple) {
+
+	pr_info("ROHC_RELEASE_INIT\n");
+
+	kfree(rcouple->rohc_packet_in);
+	kfree(rcouple->rohc_packet_out);
+	kfree(rcouple->feedback_to_send_buf);
+	kfree(rcouple->rcvd_feedback_buf);
+
+	return 0;
+
 }
 
 int rohc_my_comp(struct rohc_init *rcouple,
@@ -351,6 +361,9 @@ static int my_comp(void) {
 }
 
 static void my_comp_exit(void) {
+
+	rohc_release_init(&rinit);
+
     nf_unregister_net_hook(&init_net, &nfin);
 	nf_unregister_net_hook(&init_net, &nfout);
 }
