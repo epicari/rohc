@@ -121,7 +121,7 @@ int rohc_my_comp(struct rohc_init *rcouple,
 	pr_info("set arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	pr_info("set rohc_packet\n");
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->len, arrival_time);
 	pr_info("set ip_packet\n");
 	rohc_status_t status;
 
@@ -200,7 +200,7 @@ int rohc_my_decomp(struct rohc_init *rcouple,
 	const struct rohc_ts arrival_time = { .sec = 0, 
 										.nsec = 0 };
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-													ntohs(ih->tot_len), arrival_time);
+													skb->len, arrival_time);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
