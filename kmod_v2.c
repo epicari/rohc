@@ -236,14 +236,13 @@ static int my_comp(void) {
 	rohc_release(&rinit);
 
     nfin.hook = hook_comp;
-    nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-	//nfin.hooknum = NF_INET_LOCAL_OUT;
+    //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	nfin.hooknum = NF_INET_LOCAL_IN;
     nfin.pf = PF_INET;
     nfin.priority = NF_IP_PRI_LAST;
 	nfin.priv = NULL;
 
 	nf_register_net_hook(&init_net, &nfin);
-	pr_info("register net hook\n");
 
     return 0;
 }
