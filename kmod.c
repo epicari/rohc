@@ -111,9 +111,11 @@ int rohc_my_comp(struct rohc_init *rcouple,
 	pr_info("ROHC_COMP_INIT\n");
 
 	const struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
+	pr_info("set arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	pr_info("set rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, ntohs(ih->tot_len), arrival_time);
-
+	pr_info("set ip_packet\n");
 	rohc_status_t status;
 
 	rcouple->rohc_out_size = 0;
