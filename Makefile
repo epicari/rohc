@@ -1,5 +1,5 @@
 
-obj-m := hello_func_test.o
+obj-m := hello_func.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)

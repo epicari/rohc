@@ -98,6 +98,7 @@ static int my_init(void) {
 
 static void my_exit(void) {
     nf_unregister_net_hook(&init_net, &nfhi);
+	pr_info("exit nfhi\n");
 	nf_unregister_net_hook(&init_net, &nfho);
 }
 
