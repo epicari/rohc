@@ -213,7 +213,7 @@ static unsigned int hook_comp (void *priv,
 	struct iphdr *ih;
 
 	iph = ip_hdr(skb);
-	ih = skb_header_pointer(skb, iph->frag_off, iph->tot_len, &iph);
+	ih = skb_header_pointer(skb, iph->frag_off, sizeof(iph), &iph);
 
 	if (iph->protocol == IPPROTO_TCP) {
 
