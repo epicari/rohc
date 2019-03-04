@@ -118,16 +118,14 @@ int rohc_my_comp(struct rohc_init *rcouple,
 	pr_info("ROHC_COMP_INIT\n");
 
 	const struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
-	pr_info("set arrival_time\n");
+	pr_info("Set arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
-	pr_info("set rohc_packet\n");
+	pr_info("Set rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->len, arrival_time);
-	pr_info("set ip_packet\n");
+	pr_info("Set ip_packet\n");
 	rohc_status_t status;
 
 	rcouple->rohc_out_size = 0;
-
-	pr_info("rohc_comp_new2\n");
 
 	rcouple->compressor = rohc_comp_new2(ROHC_SMALL_CID, ROHC_SMALL_CID_MAX, 
 									gen_false_random_num, NULL);
@@ -137,15 +135,21 @@ int rohc_my_comp(struct rohc_init *rcouple,
 		goto free_comp;
 	}
 
+	pr_info("Set compressor\n");
+
 	if(!rohc_comp_set_traces_cb2(rcouple->compressor, rohc_print_traces, NULL)) {
 		pr_info("cannot set trace callback for compressor\n");
 		goto free_comp;
 	}
 
+	pr_info("Set traces\n");
+
 	if(!rohc_comp_set_features(rcouple->compressor, ROHC_COMP_FEATURE_DUMP_PACKETS)) {
 		pr_info("failed to enable packet dumps\n");
 		goto free_comp;
 	}
+
+	pr_info("Set features\n");	
 
 	if(!rohc_comp_enable_profiles(rcouple->compressor,
 			ROHC_PROFILE_UNCOMPRESSED, ROHC_PROFILE_RTP,
@@ -154,6 +158,8 @@ int rohc_my_comp(struct rohc_init *rcouple,
 		pr_info("failed to enable the TCP profile\n");
 		goto free_comp;
 	}
+
+	pr_info("enable profiles\n");	
 
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
