@@ -230,13 +230,19 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	pr_info("ROHC_DECOMP\n");
 
 	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
+	pr_info("arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													skb->len, arrival_time);
+	pr_info("comp_rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
+	pr_info("uncomp_ip_packet\n");
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
+	pr_info("rcvd_feedback\n");
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+	pr_info("feedback_to_send\n");
 	struct rohc_comp *comp_associated = rcouple->compressor;
+	pr_info("comp_associated\n");
 
 	rohc_status_t status;
 
