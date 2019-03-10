@@ -88,24 +88,12 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-	int i,j;
-
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-
-	i = rohc_release_comp(&rinit);
-
-	if (i == 1)
-		return 1;
-
-	j = rohc_release_decomp(&rinit);
-
-	if (j == 1)
-		return 1;
 
 	return 0;
 }
@@ -345,7 +333,19 @@ static unsigned int hook_decomp (void *priv,
 
 static int my_comp(void) {
 
+	int i, j;
+
 	rohc_release(&rinit);
+	
+	i = rohc_release_comp(&rinit);
+
+	if (i == 1)
+		return 1;
+
+	j = rohc_release_decomp(&rinit);
+
+	if (j == 1)
+		return 1;
 
 	nfin.hook = hook_decomp;
     //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
