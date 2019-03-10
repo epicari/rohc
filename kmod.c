@@ -212,7 +212,6 @@ static int rohc_comp(struct rohc_init *rcouple,
 	}
 	else {
 		pr_info("Compression failed\n");
-		rohc_comp_free(rcouple->compressor);
 		return 1;
 	}
 
@@ -260,7 +259,6 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
-		rohc_decomp_free(rcouple->decompressor);
 		return 1;
 	}
 
@@ -292,7 +290,7 @@ static unsigned int hook_comp (void *priv,
 			if (rts == 0)
 				return NF_ACCEPT;
 			else
-				return NF_DROP;
+				return NF_ACCEPT;
 		}		
 		else
 			return NF_ACCEPT;
@@ -322,7 +320,7 @@ static unsigned int hook_decomp (void *priv,
 				return NF_ACCEPT;
 
 			else
-				return NF_DROP;
+				return NF_ACCEPT;
 		}
 		else
 			return NF_ACCEPT;		
