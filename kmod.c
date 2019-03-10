@@ -114,6 +114,9 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 
 	pr_info("ROHC_RELEASE_INIT\n");
 
+	rohc_comp_free(rcouple->compressor);
+	rohc_decomp_free(rcouple->decompressor);
+
 	kfree(rcouple->rohc_packet_in);
 	kfree(rcouple->rohc_packet_out);
 	kfree(rcouple->feedback_to_send_buf);
