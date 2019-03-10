@@ -294,12 +294,12 @@ static unsigned int hook_comp (void *priv,
 			rts = rohc_comp(&rinit, skb);
 
 			if (rts == 0) {
-				pr_info ("RTS = 0\n");
+				pr_info ("COMP RTS = 0\n");
 				return NF_ACCEPT;
 			}
 			else {
-				pr_info ("RTS = 1\n");
-				return NF_ACCEPT;
+				pr_info ("COMP RTS = 1\n");
+				return NF_DROP;
 			}
 		}		
 		else
@@ -327,12 +327,12 @@ static unsigned int hook_decomp (void *priv,
 			rts = rohc_decomp(&rinit, skb);
 
 			if (rts == 0) {
-				pr_info ("RTS = 0\n");
+				pr_info ("DECOMP RTS = 0\n");
 				return NF_ACCEPT;
 			}
 			else {
-				pr_info ("RTS = 1\n");
-				return NF_ACCEPT;
+				pr_info ("DECOMP RTS = 1\n");
+				return NF_DROP;
 			}
 		}
 		else
