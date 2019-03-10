@@ -333,19 +333,9 @@ static unsigned int hook_decomp (void *priv,
 
 static int my_comp(void) {
 
-	int i, j;
-
 	rohc_release(&rinit);
-	
-	i = rohc_release_comp(&rinit);
-
-	if (i == 1)
-		return 1;
-
-	j = rohc_release_decomp(&rinit);
-
-	if (j == 1)
-		return 1;
+	rohc_release_comp(&rinit);
+	rohc_release_decomp(&rinit);
 
 	nfin.hook = hook_decomp;
     //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
