@@ -181,6 +181,15 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 		return 1;
 	}
 
+	rcouple->rohc_out_size = 0;
+	rcouple->rohc_packet_out = NULL;
+	rcouple->feedback_to_send.time.sec = 0;
+	rcouple->feedback_to_send.time.nsec = 0;
+	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send.offset = 0;
+	rcouple->feedback_to_send.len = 0;
+
 	return 0;
 }
 
@@ -189,18 +198,10 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP\n");
 
-	struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
+	const struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->len, arrival_time);
 	rohc_status_t status;
-
-	rcouple->rohc_out_size = 0;
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
 
 	rohc_buf_append_buf(&rohc_packet, rcouple->feedback_to_send);
 	rohc_buf_pull(&rohc_packet, rcouple->feedback_to_send.len);
@@ -229,10 +230,11 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP\n");
 
-	struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
+	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	pr_info("arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-													skb->len, arrival_time);
+													sizeof(rcouple->rohc_packet_out), 
+													arrival_time);
 	pr_info("comp_rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	pr_info("uncomp_ip_packet\n");
