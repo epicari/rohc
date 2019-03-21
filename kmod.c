@@ -103,8 +103,8 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
-	rcouple->rohc_packet_in[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rohc_packet_out[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	//rcouple->rohc_packet_in[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	//rcouple->rohc_packet_out[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	//rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	//rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	//rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -120,8 +120,8 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 	rohc_comp_free(rcouple->compressor);
 	rohc_decomp_free(rcouple->decompressor);
 
-	kfree(rcouple->rohc_packet_in);
-	kfree(rcouple->rohc_packet_out);
+	//kfree(rcouple->rohc_packet_in);
+	//kfree(rcouple->rohc_packet_out);
 	//kfree(rcouple->feedback_to_send_buf);
 	//kfree(rcouple->rcvd_feedback_buf);
 
@@ -195,9 +195,9 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 		return 1;
 	}
 
-	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[0] = NULL;
-	rcouple->rohc_packet_in[0] = NULL;
+	//rcouple->rohc_out_size = 0;
+	//rcouple->rohc_packet_out[0] = NULL;
+	//rcouple->rohc_packet_in[0] = NULL;
 	//rcouple->feedback_to_send.time.sec = 0;
 	//rcouple->feedback_to_send.time.nsec = 0;
 	//rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
