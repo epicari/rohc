@@ -196,8 +196,8 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	//rcouple->rohc_packet_out = NULL;
-	//rcouple->rohc_packet_in = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
+	rcouple->rohc_packet_in[0] = NULL;
 	//rcouple->feedback_to_send.time.sec = 0;
 	//rcouple->feedback_to_send.time.nsec = 0;
 	//rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -250,7 +250,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 	return 0;
 
 error:
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
 	return 1;
 }
 
@@ -314,8 +314,8 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 error:
 	rcouple->ip_out_size = 0;
-	rcouple->rohc_packet_out = NULL;
-	rcouple->rohc_packet_in = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
+	rcouple->rohc_packet_in[0] = NULL;
 	return 1;
 }
 
