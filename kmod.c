@@ -301,7 +301,7 @@ static unsigned int hook_comp (void *priv,
 			}
 			else {
 				pr_info ("COMP RTS = 1\n");
-				return NF_ACCEPT;
+				return NF_DROP;
 			}
 		}		
 		else
@@ -334,7 +334,7 @@ static unsigned int hook_decomp (void *priv,
 			}
 			else {
 				pr_info ("DECOMP RTS = 1\n");
-				return NF_ACCEPT;
+				return NF_DROP;
 			}
 		}
 		else
