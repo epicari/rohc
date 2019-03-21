@@ -260,10 +260,11 @@ static int rohc_decomp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 
+	const size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													strlen(rcouple->rohc_packet_out), 
 													arrival_time);
-	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, output_pkt_max_len);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
