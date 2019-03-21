@@ -89,7 +89,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-	memset(rcouple, 0, sizeof(struct rohc_init));
+	//memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
