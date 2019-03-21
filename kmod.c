@@ -194,13 +194,18 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 }
 
 static int rohc_comp(struct rohc_init *rcouple,
-				struct sk_buff *skb) {
+				struct sk_buff *skb,
+				struct tcphdr *tph) {
 
 	pr_info("ROHC_COMP\n");
 
-	const struct rohc_ts arrival_time = { .sec = 0 , .nsec = 0 };
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	const struct rohc_ts arrival_time = {
+		.sec = tph.ts.tv_sec ,
+		.nsec = tph.ts.tv_usec * 1000
+	};
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+
 	rohc_status_t status;
 
 	rohc_buf_append_buf(&rohc_packet, rcouple->feedback_to_send);
@@ -236,20 +241,14 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	pr_info("ROHC_DECOMP\n");
 
 	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
-	pr_info("arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
 													strlen(rcouple->rohc_packet_out), 
 													arrival_time);
-	pr_info("comped_rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
-	pr_info("uncomp_ip_packet\n");
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
-	pr_info("rcvd_feedback\n");
 	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
-	pr_info("feedback_to_send\n");
 	struct rohc_comp *comp_associated = rcouple->compressor;
-	pr_info("comp_associated\n");
 
 	rohc_status_t status;
 
@@ -304,7 +303,7 @@ static unsigned int hook_comp (void *priv,
 
 		if (tph) {
 
-			rts = rohc_comp(&rinit, skb);
+			rts = rohc_comp(&rinit, skb, tph);
 
 			if (rts == 0) {
 				pr_info ("COMP RTS = 0\n");
