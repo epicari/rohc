@@ -97,12 +97,11 @@ static void rohc_print_traces(void *const priv_ctxt __attribute__((unused)),
 static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
-	const size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
-	rcouple->rohc_packet_in = kzalloc(output_pkt_max_len, GFP_KERNEL);
-	rcouple->rohc_packet_out = kzalloc(output_pkt_max_len, GFP_KERNEL);
+	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
