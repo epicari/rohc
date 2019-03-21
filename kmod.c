@@ -215,13 +215,13 @@ static int rohc_comp(struct rohc_init *rcouple,
 	pr_info("ROHC_COMP\n");
 
 	struct timespec unix_ts;
-/*
+
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
-*/
-	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
+
+	//const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 	//uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
@@ -261,12 +261,12 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	pr_info("ROHC_DECOMP\n");
 
 	struct timespec unix_ts;
-/*
+
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
-*/
+
 	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 /*
@@ -276,15 +276,14 @@ static int rohc_decomp(struct rohc_init *rcouple,
 */
 	//uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
 	//uint8_t rohc_pkt_in = &rcouple->rohc_packet_in;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
-	//struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-	//												skb->hdr_len, arrival_time);
+	//struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
+													skb->hdr_len, arrival_time);
 	struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	//struct rohc_buf uncomp_packet = rohc_buf_init_full(rohc_pkt_in, skb->hdr_len, arrival_time);
-	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
-														BUFFER_SIZE);
-	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
-	struct rohc_comp *comp_associated = rcouple->compressor;
+	//struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, BUFFER_SIZE);
+	//struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+	//struct rohc_comp *comp_associated = rcouple->compressor;
 
 	rohc_status_t status;
 
