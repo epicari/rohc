@@ -208,7 +208,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_COMP\n");
 
-	const struct timespec unix_ts;
+	struct timespec unix_ts;
 
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
@@ -253,7 +253,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	pr_info("ROHC_DECOMP\n");
 
-	const struct timespec unix_ts;
+	struct timespec unix_ts;
 
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
@@ -262,7 +262,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	const size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-													strlen(rcouple->rohc_packet_out), 
+													skb->hdr_len, 
 													arrival_time);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, output_pkt_max_len);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
