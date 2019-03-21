@@ -233,9 +233,9 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	pr_info("arrival_time\n");
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
-													sizeof(rcouple->rohc_packet_out), 
+													strlen(rcouple->rohc_packet_out), 
 													arrival_time);
-	pr_info("comp_rohc_packet\n");
+	pr_info("comped_rohc_packet\n");
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	pr_info("uncomp_ip_packet\n");
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
