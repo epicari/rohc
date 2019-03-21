@@ -216,7 +216,6 @@ static int rohc_comp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 
-	const size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out,
 													 rcouple->output_pkt_max_len);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
