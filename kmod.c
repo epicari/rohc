@@ -59,8 +59,8 @@ struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	unsigned char *rohc_packet_out; // comp ROHC packet
-	unsigned char *rohc_packet_in; // ROHC packet to decomp
+	uint8_t *rohc_packet_out[BUFFER_SIZE]; // comp ROHC packet
+	uint8_t *rohc_packet_in[BUFFER_SIZE]; // ROHC packet to decomp
 
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
@@ -192,7 +192,7 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -215,8 +215,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
-	uint8_t rohc_buff[BUFFER_SIZE];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_buff,
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out,
 													 BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 
@@ -241,11 +240,10 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	rcouple->rohc_packet_out = NULL;
 	return 0;
 
 error:
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
 	return 1;
 }
 
@@ -296,8 +294,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 		goto error;
 	}
 
-	rcouple->rohc_packet_in = NULL;
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out[0] = NULL;
 	return 0;
 
 error:
