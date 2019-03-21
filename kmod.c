@@ -263,11 +263,12 @@ static int rohc_decomp(struct rohc_init *rcouple,
 													skb->hdr_len, 
 													arrival_time);
 */
-	struct rohc_buf *rohc_pkt_out = rcouple->rohc_packet_out;
-	struct rohc_buf *rohc_pkt_in = rcouple->rohc_packet_in;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf,
+	unsigned char *rohc_pkt_out = &rcouple->rohc_packet_out;
+	unsigned char *rohc_pkt_in = &rcouple->rohc_packet_in;
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_out,
 													 BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_empty(rohc_pkt_in,
+
 												 BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
