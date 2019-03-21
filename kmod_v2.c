@@ -361,7 +361,7 @@ static int my_comp(void) {
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
-    nfout.hook = hook_comp;
+    nfout.hook = hook_decomp;
     //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
 	nfout.hooknum = NF_INET_LOCAL_OUT;
     nfout.pf = PF_INET;
