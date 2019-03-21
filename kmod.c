@@ -101,8 +101,8 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
-	rcouple->rohc_packet_in = kzalloc(output_pkt_max_len, GFP_KERNEL);
-	rcouple->rohc_packet_out = kzalloc(output_pkt_max_len, GFP_KERNEL);
+	rcouple->rohc_packet_in[] = kzalloc(output_pkt_max_len, GFP_KERNEL);
+	rcouple->rohc_packet_out[] = kzalloc(output_pkt_max_len, GFP_KERNEL);
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
