@@ -59,8 +59,8 @@ struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	uint8_t *rohc_packet_out; // comp ROHC packet
-	uint8_t *rohc_packet_in; // ROHC packet to decomp
+	uint8_t *rohc_packet_out[]; // comp ROHC packet
+	uint8_t *rohc_packet_in[]; // ROHC packet to decomp
 
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
@@ -192,7 +192,7 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out[] = {BUFFER_SIZE};
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
