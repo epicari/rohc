@@ -59,8 +59,8 @@ struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	unsigned char *rohc_packet_out; // comp ROHC packet
-	unsigned char *rohc_packet_in; // ROHC packet to decomp
+	uint32_t *rohc_packet_out; // comp ROHC packet
+	uint32_t *rohc_packet_in; // ROHC packet to decomp
 
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
@@ -193,7 +193,7 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out = 0;
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -242,11 +242,11 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out = 0;
 	return 0;
 
 error:
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out = 0;
 	return 1;
 }
 
@@ -297,12 +297,12 @@ static int rohc_decomp(struct rohc_init *rcouple,
 		goto error;
 	}
 
-	rcouple->rohc_packet_in[0] = NULL;
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_in = 0;
+	rcouple->rohc_packet_out = 0;
 	return 0;
 
 error:
-	rcouple->rohc_packet_out = NULL;
+	rcouple->rohc_packet_out = 0;
 	rcouple->ip_out_size = 0;
 	return 1;
 }
