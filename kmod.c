@@ -98,7 +98,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-	memset(&rcouple, 0, sizeof(struct rohc_init));
+	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -216,8 +216,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 	};
 
 	const size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
-	uint8_t output_pkt[output_pkt_max_len];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(output_pkt, output_pkt_max_len);
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, output_pkt_max_len);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 
 	rohc_status_t status;
