@@ -70,6 +70,9 @@ struct rohc_init {
 	size_t rohc_out_size; // comp ROHC packet
 	size_t ip_out_size; // decomp IP packet
 
+	uint8_t *rohc_pkt_out = &rcouple->rohc_packet_out;
+	uint8_t *rohc_pkt_in = &rcouple->rohc_packet_in;
+
 };
 
 static struct rohc_init rinit;
@@ -100,8 +103,8 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
-	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rohc_pkt_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rohc_pkt_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
@@ -215,8 +218,8 @@ static int rohc_comp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
-	uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_out,
+
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_pkt_out,
 													 BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 
@@ -264,11 +267,10 @@ static int rohc_decomp(struct rohc_init *rcouple,
 													skb->hdr_len, 
 													arrival_time);
 */
-	uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
-	uint8_t rohc_pkt_in = &rcouple->rohc_packet_in;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_out,
+
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_pkt_out,
 													 BUFFER_SIZE);
-	struct rohc_buf ip_packet = rohc_buf_init_empty(rohc_pkt_in,
+	struct rohc_buf ip_packet = rohc_buf_init_empty(rcouple->rohc_pkt_in,
 												 BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, 
 														BUFFER_SIZE);
