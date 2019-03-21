@@ -43,13 +43,13 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-//#define BUFFER_SIZE 10241
+#define BUFFER_SIZE 10000
 
 /** The device MTU (TODO: should not be hardcoded) */
-#define DEV_MTU  0xffffU
+#define DEV_MTU  0xffffU //65535
 
 /** The maximal size for the ROHC packets */
-#define BUFFER_SIZE  (DEV_MTU + 100U)
+//#define BUFFER_SIZE  (DEV_MTU + 100U)
 
 /** The length (in bytes) of the TCP/IP header */
 #define TCP_IP_HDR_LEN  40U
