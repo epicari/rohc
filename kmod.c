@@ -43,7 +43,13 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 10241
+//#define BUFFER_SIZE 10241
+
+/** The device MTU (TODO: should not be hardcoded) */
+#define DEV_MTU  0xffffU
+
+/** The maximal size for the ROHC packets */
+#define BUFFER_SIZE  (DEV_MTU + 100U)
 
 struct rohc_init {
 
@@ -89,7 +95,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-	//memset(rcouple, 0, sizeof(struct rohc_init));
+	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
