@@ -199,12 +199,12 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	rcouple->rohc_out_size = 0;
 	rcouple->rohc_packet_out = NULL;
 	rcouple->rohc_packet_in = NULL;
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
+	//rcouple->feedback_to_send.time.sec = 0;
+	//rcouple->feedback_to_send.time.nsec = 0;
+	//rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
+	//rcouple->feedback_to_send.max_len = BUFFER_SIZE;
+	//rcouple->feedback_to_send.offset = 0;
+	//rcouple->feedback_to_send.len = 0;
 
 	return 0;
 }
