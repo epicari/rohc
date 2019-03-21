@@ -221,7 +221,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 */
-	const struct rohc_ts arrival_times = { .sec = 0, .nsec = 0 };
+	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 	//uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
@@ -267,7 +267,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 		.nsec = unix_ts.tv_nsec
 	};
 */
-	const struct rohc_ts arrival_times = { .sec = 0, .nsec = 0 };
+	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 /*
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
