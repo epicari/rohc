@@ -203,7 +203,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
-		.nsec = unix_ts.tv_usec * 1000
+		.nsec = unix_ts.tv_nsec
 	};
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
