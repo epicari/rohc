@@ -36,6 +36,7 @@
 #include <linux/tcp.h>
 #include <linux/uaccess.h>
 #include <linux/proc_fs.h>
+#include <linux/time.h>
 
 #include "config.h"
 #include "rohc.h"
@@ -194,14 +195,15 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 }
 
 static int rohc_comp(struct rohc_init *rcouple,
-				struct sk_buff *skb,
-				struct tcphdr *tph) {
+				struct sk_buff *skb) {
 
 	pr_info("ROHC_COMP\n");
 
+	const struct timespec unix_ts;
+
 	const struct rohc_ts arrival_time = {
-		.sec = tph.ts.tv_sec ,
-		.nsec = tph.ts.tv_usec * 1000
+		.sec = unix_ts.tv_sec ,
+		.nsec = unix_ts.tv_usec * 1000
 	};
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
@@ -303,7 +305,7 @@ static unsigned int hook_comp (void *priv,
 
 		if (tph) {
 
-			rts = rohc_comp(&rinit, skb, tph);
+			rts = rohc_comp(&rinit, skb);
 
 			if (rts == 0) {
 				pr_info ("COMP RTS = 0\n");
