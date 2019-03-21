@@ -213,7 +213,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 	}
 	else {
 		pr_info("Compression failed\n");
-		return 1;
+		goto error;
 	}
 
 	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
@@ -222,7 +222,12 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_buf_reset(&rcouple->feedback_to_send);
 
+	rcouple->rohc_packet_out = NULL;
 	return 0;
+
+error:
+	rcouple->rohc_packet_out = NULL;
+	return 1;
 }
 
 static int rohc_decomp(struct rohc_init *rcouple,
@@ -260,17 +265,23 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	else {
 		pr_info("ROHC decomp failed\n");
 		rohc_decomp_free(rcouple->decompressor);
-		return 1;
+		goto error;
 	}
 
 	rcouple->ip_out_size = ip_packet.len;
 
 	if(!rohc_comp_deliver_feedback2(comp_associated, rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
-		return 1;
+		goto error;
 	}
 
+	rcouple->rohc_packet_out = NULL;
 	return 0;
+
+error:
+	rcouple->rohc_packet_out = NULL;
+	rcouple->ip_out_size = 0;
+	return 1;
 }
 
 static int gen_false_random_num(const struct rohc_comp *const comp,
