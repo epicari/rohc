@@ -261,11 +261,13 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	pr_info("ROHC_DECOMP\n");
 
 	struct timespec unix_ts;
-
+/*
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
+*/
+	const struct rohc_ts arrival_times = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
 /*
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, 
