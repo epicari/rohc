@@ -59,11 +59,11 @@ struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	//uint8_t *rohc_packet_out[BUFFER_SIZE]; 
-	//uint8_t *rohc_packet_in[BUFFER_SIZE]; 
+	uint8_t *rohc_packet_out[BUFFER_SIZE]; 
+	uint8_t *rohc_packet_in[BUFFER_SIZE]; 
 
-	unsigned char *rohc_packet_out; // comp ROHC packet
-	unsigned char *rohc_packet_in; // ROHC packet to decomp
+	//unsigned char *rohc_packet_out; // comp ROHC packet
+	//unsigned char *rohc_packet_in; // ROHC packet to decomp
 
 	unsigned char *feedback_to_send_buf; // feedback to send decomp
 	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
@@ -103,10 +103,10 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
-	//rcouple->rohc_packet_in[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	//rcouple->rohc_packet_out[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rohc_packet_in[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rohc_packet_out[BUFFER_SIZE] = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	//rcouple->rohc_packet_in = kzalloc(BUFFER_SIZE, GFP_KERNEL);
+	//rcouple->rohc_packet_out = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	//rcouple->feedback_to_send_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 	//rcouple->rcvd_feedback_buf = kzalloc(BUFFER_SIZE, GFP_KERNEL);
 
@@ -196,8 +196,8 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out = NULL;
-	rcouple->rohc_packet_in = NULL;
+	//rcouple->rohc_packet_out = NULL;
+	//rcouple->rohc_packet_in = NULL;
 	//rcouple->feedback_to_send.time.sec = 0;
 	//rcouple->feedback_to_send.time.nsec = 0;
 	//rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -222,8 +222,8 @@ static int rohc_comp(struct rohc_init *rcouple,
 */
 	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//size_t output_pkt_max_len = TCP_IP_HDR_LEN + BUFFER_SIZE;
-	//uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_out, BUFFER_SIZE);
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 
 	rohc_status_t status;
@@ -273,11 +273,11 @@ static int rohc_decomp(struct rohc_init *rcouple,
 													skb->hdr_len, 
 													arrival_time);
 */
-	//uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
-	//uint8_t rohc_pkt_in = &rcouple->rohc_packet_in;
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	uint8_t rohc_pkt_out = &rcouple->rohc_packet_out;
+	uint8_t rohc_pkt_in = &rcouple->rohc_packet_in;
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_out, BUFFER_SIZE);
 	//struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, skb->hdr_len, arrival_time);
-	struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
+	struct rohc_buf uncomp_packet = rohc_buf_init_empty(rohc_pkt_in, BUFFER_SIZE);
 	//struct rohc_buf uncomp_packet = rohc_buf_init_full(rohc_pkt_in, skb->hdr_len, arrival_time);
 	//struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, BUFFER_SIZE);
 	//struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
