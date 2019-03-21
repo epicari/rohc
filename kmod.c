@@ -59,8 +59,8 @@ struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	uint8_t *rohc_packet_out[BUFFER_SIZE]; 
-	uint8_t *rohc_packet_in[BUFFER_SIZE]; 
+	uint8_t rohc_packet_out[BUFFER_SIZE]; 
+	uint8_t rohc_packet_in[BUFFER_SIZE]; 
 
 	//unsigned char *rohc_packet_out; // comp ROHC packet
 	//unsigned char *rohc_packet_in; // ROHC packet to decomp
