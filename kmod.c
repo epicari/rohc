@@ -363,7 +363,8 @@ static unsigned int hook_decomp (void *priv,
 			}
 			else {
 				pr_info ("DECOMP RTS = 1\n");
-				return NF_DROP;
+				//return NF_DROP;
+				return NF_ACCEPT;
 			}
 		}
 		else
