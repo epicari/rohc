@@ -223,6 +223,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 
 	rohc_status_t status;
+	rcouple->rohc_out_size = 0;
 
 	rohc_buf_append_buf(&rohc_packet, rcouple->feedback_to_send);
 	rohc_buf_pull(&rohc_packet, rcouple->feedback_to_send.len);
@@ -282,7 +283,6 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	else {
 		pr_info("ROHC decomp failed\n");
-		rohc_decomp_free(rcouple->decompressor);
 		goto error;
 	}
 
