@@ -330,7 +330,8 @@ static unsigned int hook_comp (void *priv,
 			}
 			else {
 				pr_info ("COMP RTS = 1\n");
-				return NF_DROP;
+				//return NF_DROP;
+				return NF_ACCEPT;
 			}
 		}		
 		else
