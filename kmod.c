@@ -65,8 +65,8 @@ struct rohc_init {
 	//unsigned char *rohc_packet_out; 
 	//unsigned char *rohc_packet_in; 
 
-	unsigned char *feedback_to_send_buf; // feedback to send decomp
-	unsigned char *rcvd_feedback_buf; // comp feedback rcvd
+	uint8_t feedback_to_send_buf[BUFFER_SIZE]; // feedback to send decomp
+	uint8_t rcvd_feedback_buf[BUFFER_SIZE]; // comp feedback rcvd
 
 	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
 
@@ -105,8 +105,8 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	rcouple->rohc_packet_in[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->feedback_to_send_buf = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rcvd_feedback_buf = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->feedback_to_send_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	rcouple->rcvd_feedback_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 	return 0;
 }
@@ -251,11 +251,11 @@ static int rohc_comp(struct rohc_init *rcouple,
 		goto error;
 	}
 
-	rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
+	//rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
 
 	rcouple->rohc_out_size = rohc_packet.len;
 
-	rohc_buf_reset(&rcouple->feedback_to_send);
+	//rohc_buf_reset(&rcouple->feedback_to_send);
 
 	return 0;
 
@@ -279,7 +279,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, skb->hdr_len, arrival_time);
 	struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, BUFFER_SIZE);
-	struct rohc_buf *feedback_to_send = &rcouple->feedback_to_send;
+	struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
 	struct rohc_comp *comp_associated = rcouple->compressor;
 
 	rohc_status_t status;
