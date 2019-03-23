@@ -65,7 +65,7 @@ struct rohc_init {
 	uint8_t feedback_to_send_buf[BUFFER_SIZE]; // feedback to send decomp
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE]; // comp feedback rcvd
 
-	struct rohc_buf feedback_to_send = rohc_buf_init_empty (
+	struct rohc_buf *feedback_to_send = rohc_buf_init_empty (
 										feedback_to_send_buf, BUFFER_SIZE);
 
 	size_t rohc_out_size; // comp ROHC packet
