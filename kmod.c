@@ -103,6 +103,17 @@ static int rohc_release(struct rohc_init *rcouple) {
 
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
+	rcouple->rohc_out_size = 0;
+	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
+	rcouple->feedback_to_send_buf[BUFFER_SIZE] = {NULL};
+	rcouple->feedback_to_send.time.sec = 0;
+	rcouple->feedback_to_send.time.nsec = 0;
+	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send.offset = 0;
+	rcouple->feedback_to_send.len = 0;
+
 	rcouple->rohc_packet_in[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->feedback_to_send_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -114,6 +125,17 @@ static int rohc_release(struct rohc_init *rcouple) {
 static int rohc_release_init(struct rohc_init *rcouple) {
 
 	pr_info("ROHC_RELEASE_INIT\n");
+
+	rcouple->rohc_out_size = 0;
+	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
+	rcouple->feedback_to_send_buf[BUFFER_SIZE] = {NULL};
+	rcouple->feedback_to_send.time.sec = 0;
+	rcouple->feedback_to_send.time.nsec = 0;
+	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send.offset = 0;
+	rcouple->feedback_to_send.len = 0;
 
 	rohc_comp_free(rcouple->compressor);
 	rohc_decomp_free(rcouple->decompressor);
@@ -191,31 +213,10 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 		goto error;
 	}
 
-	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
-	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
-
 	return 0;
 
 error:
 	rohc_decomp_free(rcouple->decompressor);
-
-	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
-	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
-
 	return 0;
 }
 
