@@ -104,12 +104,12 @@ static int rohc_release(struct rohc_init *rcouple) {
 	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
 	rcouple->feedback_to_send_buf[BUFFER_SIZE] = NULL;
 	rcouple->rcvd_feedback_buf[BUFFER_SIZE] = NULL;
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
+	rcouple->feedback_to_send->time.sec = 0;
+	rcouple->feedback_to_send->time.nsec = 0;
+	rcouple->feedback_to_send->data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send->max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send->offset = 0;
+	rcouple->feedback_to_send->len = 0;
 
 	rcouple->rohc_packet_in[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 	rcouple->rohc_packet_out[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
@@ -127,12 +127,12 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
 	rcouple->feedback_to_send_buf[BUFFER_SIZE] = NULL;
 	rcouple->rcvd_feedback_buf[BUFFER_SIZE] = NULL;
-	rcouple->feedback_to_send.time.sec = 0;
-	rcouple->feedback_to_send.time.nsec = 0;
-	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
-	rcouple->feedback_to_send.max_len = BUFFER_SIZE;
-	rcouple->feedback_to_send.offset = 0;
-	rcouple->feedback_to_send.len = 0;
+	rcouple->feedback_to_send->time.sec = 0;
+	rcouple->feedback_to_send->time.nsec = 0;
+	rcouple->feedback_to_send->data = rcouple->feedback_to_send_buf;
+	rcouple->feedback_to_send->max_len = BUFFER_SIZE;
+	rcouple->feedback_to_send->offset = 0;
+	rcouple->feedback_to_send->len = 0;
 
 	rohc_comp_free(rcouple->compressor);
 	rohc_decomp_free(rcouple->decompressor);
@@ -238,7 +238,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 	rohc_status_t status;
 
 	rohc_buf_append_buf(rcouple->rohc_packet, rcouple->feedback_to_send);
-	rohc_buf_pull(rcouple->rohc_packet, rcouple->feedback_to_send.len);
+	rohc_buf_pull(rcouple->rohc_packet, rcouple->feedback_to_send->len);
 
 	status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, rcouple->rohc_packet);
 
@@ -250,7 +250,7 @@ static int rohc_comp(struct rohc_init *rcouple,
 		goto error;
 	}
 
-	//rohc_buf_push(&rohc_packet, rcouple->feedback_to_send.len);
+	//rohc_buf_push(&rohc_packet, rcouple->feedback_to_send->len);
 	//rohc_buf_reset(rcouple->feedback_to_send);
 
 	return 0;
@@ -280,8 +280,8 @@ static int rohc_decomp(struct rohc_init *rcouple,
 
 	rohc_status_t status;
 
-	//rcouple->feedback_to_send.data -= rcouple->feedback_to_send.offset;
-	//rcouple->feedback_to_send.len = 0;
+	//rcouple->feedback_to_send->data -= rcouple->feedback_to_send->offset;
+	//rcouple->feedback_to_send->len = 0;
 
 	status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, rcouple->ip_packet, 
 							rcouple->rcvd_feedback, rcouple->feedback_to_send);
