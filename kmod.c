@@ -192,8 +192,8 @@ static int rohc_release_decomp(struct rohc_init *rcouple) {
 	}
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[0] = NULL;
-	rcouple->rohc_packet_in[0] = NULL;
+	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -207,8 +207,8 @@ error:
 	rohc_decomp_free(rcouple->decompressor);
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[0] = NULL;
-	rcouple->rohc_packet_in[0] = NULL;
+	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
