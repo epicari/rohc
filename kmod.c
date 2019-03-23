@@ -62,13 +62,11 @@ struct rohc_init {
 	uint8_t rohc_packet_out[BUFFER_SIZE]; // comp ROHC packet
 	uint8_t rohc_packet_in[BUFFER_SIZE]; // ROHC packet to decomp
 
-	//unsigned char *rohc_packet_out; 
-	//unsigned char *rohc_packet_in; 
-
 	uint8_t feedback_to_send_buf[BUFFER_SIZE]; // feedback to send decomp
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE]; // comp feedback rcvd
 
-	struct rohc_buf feedback_to_send; // feedback to send decomp with the ROHC by
+	struct rohc_buf feedback_to_send = rohc_buf_init_empty (
+										feedback_to_send_buf, BUFFER_SIZE);
 
 	size_t rohc_out_size; // comp ROHC packet
 	size_t ip_out_size; // decomp IP packet
@@ -104,9 +102,9 @@ static int rohc_release(struct rohc_init *rcouple) {
 	memset(rcouple, 0, sizeof(struct rohc_init));
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
-	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
-	rcouple->feedback_to_send_buf[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_out[BUFFER_SIZE] = NULL;
+	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
+	rcouple->feedback_to_send_buf[BUFFER_SIZE] = NULL;
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -127,9 +125,9 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 	pr_info("ROHC_RELEASE_INIT\n");
 
 	rcouple->rohc_out_size = 0;
-	rcouple->rohc_packet_out[BUFFER_SIZE] = {NULL};
-	rcouple->rohc_packet_in[BUFFER_SIZE] = {NULL};
-	rcouple->feedback_to_send_buf[BUFFER_SIZE] = {NULL};
+	rcouple->rohc_packet_out[BUFFER_SIZE] = NULL;
+	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
+	rcouple->feedback_to_send_buf[BUFFER_SIZE] = NULL;
 	rcouple->feedback_to_send.time.sec = 0;
 	rcouple->feedback_to_send.time.nsec = 0;
 	rcouple->feedback_to_send.data = rcouple->feedback_to_send_buf;
@@ -280,15 +278,17 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, skb->hdr_len, arrival_time);
 	struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, BUFFER_SIZE);
-	struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
+	//struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
 	struct rohc_comp *comp_associated = rcouple->compressor;
 
 	rohc_status_t status;
 
 	rcouple->ip_out_size = 0;
+	rcouple->feedback_to_send.data -= rcouple->feedback_to_send.offset;
+	rcouple->feedback_to_send.len = 0;
 
 	status = rohc_decompress3(rcouple->decompressor, rohc_packet, &uncomp_packet, 
-							&rcvd_feedback, feedback_to_send);
+							&rcvd_feedback, rcouple->feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
 		pr_info("ROHC Decompression\n");
