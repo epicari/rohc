@@ -63,7 +63,7 @@ static struct rohc_init {
 
 };
 
-static struct rohc_init rinit;
+static struct rohc_init *rinit = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 static struct nf_hook_ops nfin;
 static struct nf_hook_ops nfout;
@@ -326,7 +326,7 @@ static unsigned int hook_comp (void *priv,
 
 		if (tph) {
 
-			rts = rohc_comp(&rinit, skb);
+			rts = rohc_comp(rinit, skb);
 
 			if (rts == 0) {
 				pr_info ("COMP RTS = 0\n");
@@ -360,7 +360,7 @@ static unsigned int hook_decomp (void *priv,
 
 		if (tph) {
 
-			rts = rohc_decomp(&rinit, skb);
+			rts = rohc_decomp(rinit, skb);
 
 			if (rts == 0) {
 				pr_info ("DECOMP RTS = 0\n");
@@ -381,9 +381,9 @@ static unsigned int hook_decomp (void *priv,
 
 static int my_comp(void) {
 
-	rohc_release(&rinit);
-	rohc_release_comp(&rinit);
-	rohc_release_decomp(&rinit);
+	rohc_release(rinit);
+	rohc_release_comp(rinit);
+	rohc_release_decomp(rinit);
 
 	nfin.hook = hook_decomp;
     //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
@@ -406,7 +406,7 @@ static int my_comp(void) {
 
 static void my_comp_exit(void) {
 
-	rohc_release_init(&rinit);
+	rohc_release_init(rinit);
 
     nf_unregister_net_hook(&init_net, &nfin);
 	nf_unregister_net_hook(&init_net, &nfout);
