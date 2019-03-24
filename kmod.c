@@ -98,9 +98,9 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-	struct rohc_init *rcouple = kmalloc(sizeof(struct rohc_init));
+	//struct rohc_init *rcouple = kmalloc(sizeof(struct rohc_init));
 
-	//memset(rcouple, 0, sizeof(struct rohc_init));
+	memset(rcouple, 0, sizeof(struct rohc_init));
 /*
 	rcouple->rohc_packet_out[BUFFER_SIZE] = NULL;
 	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
@@ -125,7 +125,7 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 
 	pr_info("ROHC_RELEASE_INIT\n");
 
-	kfree(rcouple);
+	//kfree(rcouple);
 /*
 	rcouple->rohc_packet_out[BUFFER_SIZE] = NULL;
 	rcouple->rohc_packet_in[BUFFER_SIZE] = NULL;
