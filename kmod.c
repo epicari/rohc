@@ -63,7 +63,7 @@ static struct rohc_init {
 
 };
 
-static struct rohc_init *rinit = kmalloc(sizeof(struct rohc_init));
+static struct rohc_init rinit = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
 static struct nf_hook_ops nfin;
 static struct nf_hook_ops nfout;
