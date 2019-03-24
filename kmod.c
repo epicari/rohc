@@ -237,10 +237,10 @@ static int rohc_comp(struct rohc_init *rcouple,
 
 	rohc_status_t status;
 
-	rohc_buf_append_buf(rcouple->rohc_packet, rcouple->feedback_to_send);
-	rohc_buf_pull(rcouple->rohc_packet, rcouple->feedback_to_send->len);
+	rohc_buf_append_buf(&rcouple->rohc_packet, *rcouple->feedback_to_send);
+	rohc_buf_pull(&rcouple->rohc_packet, rcouple->feedback_to_send->len);
 
-	status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, rcouple->rohc_packet);
+	status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, &rcouple->rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
@@ -276,15 +276,15 @@ static int rohc_decomp(struct rohc_init *rcouple,
 	//struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
 	//struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcouple->rcvd_feedback_buf, BUFFER_SIZE);
 	//struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
-	struct rohc_comp *comp_associated = rcouple->compressor;
+	//struct rohc_comp *comp_associated = rcouple->compressor;
 
 	rohc_status_t status;
 
 	//rcouple->feedback_to_send->data -= rcouple->feedback_to_send->offset;
 	//rcouple->feedback_to_send->len = 0;
 
-	status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, rcouple->ip_packet, 
-							rcouple->rcvd_feedback, rcouple->feedback_to_send);
+	status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, &rcouple->ip_packet, 
+							&rcouple->rcvd_feedback, rcouple->feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
 		pr_info("ROHC Decompression\n");
@@ -295,7 +295,7 @@ static int rohc_decomp(struct rohc_init *rcouple,
 		goto error;
 	}
 
-	if(!rohc_comp_deliver_feedback2(comp_associated, rcouple->rcvd_feedback)) {
+	if(!rohc_comp_deliver_feedback2(rcouple->compressor, rcouple->rcvd_feedback)) {
 		pr_info("failed to deliver received feedback to comp.\n");
 		goto error;
 	}
