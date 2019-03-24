@@ -50,12 +50,11 @@ static struct rohc_init {
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	uint8_t rohc_packet_out[BUFFER_SIZE]; // comp ROHC packet
+	uint8_t rohc_packet_out[BUFFER_SIZE];
 /*
-	uint8_t rohc_packet_in[BUFFER_SIZE]; // ROHC packet to decomp
-
-	uint8_t feedback_to_send_buf[BUFFER_SIZE]; // feedback to send decomp
-	uint8_t rcvd_feedback_buf[BUFFER_SIZE]; // comp feedback rcvd
+	uint8_t rohc_packet_in[BUFFER_SIZE];
+	uint8_t feedback_to_send_buf[BUFFER_SIZE];
+	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 */
 	struct rohc_buf *rohc_packet;
 	struct rohc_buf *ip_packet;
@@ -219,13 +218,13 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_COMP\n");
 
 	struct timespec unix_ts;
-	/*
+	
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
-	*/
-	const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
+	
+	//const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//uint8_t rohc_packet_out[BUFFER_SIZE];
 	//uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	//uint8_t feedback_to_send_buf[BUFFER_SIZE];
@@ -263,12 +262,12 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_DECOMP\n");
 
 	struct timespec unix_ts;
-	/*
+	
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
-	*/
+	
 	//const struct rohc_ts arrival_time = { .sec = 0, .nsec = 0 };
 	//struct rohc_buf rohc_packet = rohc_buf_init_full(rcouple->rohc_packet_out, skb->hdr_len, arrival_time);
 	//struct rohc_buf uncomp_packet = rohc_buf_init_empty(rcouple->rohc_packet_in, BUFFER_SIZE);
