@@ -322,7 +322,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	feedback_to_send.len = 0;
 
 	status = rohc_decompress3(rcouple->decompressor, ip_packet, &decomp_packet, 
-							&rcvd_feedback, feedback_to_send);
+							&rcvd_feedback, &feedback_to_send);
 
 	if(status == ROHC_STATUS_OK) {
 		pr_info("ROHC Decompression\n");
