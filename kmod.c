@@ -248,7 +248,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	rohc_status_t status;
 
-	rohc_buf_append_buf(&ip_packet, &feedback_to_send);
+	rohc_buf_append_buf(&ip_packet, feedback_to_send);
 	rohc_buf_pull(&ip_packet, feedback_to_send.len);
 
 	//status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, rcouple->rohc_packet);
