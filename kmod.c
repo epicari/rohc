@@ -106,7 +106,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 */
 
 //	rcouple->rohc_packet_in[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-	rcouple->rohc_packet_out[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+//	rcouple->rohc_packet_out[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 //	rcouple->feedback_to_send_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 //	rcouple->rcvd_feedback_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
@@ -134,7 +134,7 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 	rohc_decomp_free(rcouple->decompressor);
 */
 //	kfree(rcouple->rohc_packet_in);
-	kfree(rcouple->rohc_packet_out);
+//	kfree(rcouple->rohc_packet_out);
 //	kfree(rcouple->feedback_to_send_buf);
 //	kfree(rcouple->rcvd_feedback_buf);
 
@@ -228,8 +228,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//uint8_t rohc_packet_out[BUFFER_SIZE];
 	//uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	//uint8_t feedback_to_send_buf[BUFFER_SIZE];
-	rcouple->ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
-	rcouple->rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
+	rcouple.ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
+	rcouple.rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	//rcouple->rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 	//rcouple->feedback_to_send = rohc_buf_init_empty(feedback_to_send_buf, BUFFER_SIZE);
 
