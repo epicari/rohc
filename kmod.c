@@ -58,8 +58,8 @@ static struct rohc_init {
 */
 	struct rohc_buf rohc_packet;
 	struct rohc_buf ip_packet;
-	struct rohc_buf rcvd_feedback;
-	struct rohc_buf feedback_to_send;
+	//struct rohc_buf *rcvd_feedback;
+	//struct rohc_buf *feedback_to_send;
 
 };
 
@@ -110,6 +110,9 @@ static int rohc_release(struct rohc_init *rcouple) {
 //	rcouple->feedback_to_send_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 //	rcouple->rcvd_feedback_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
 
+	//rcouple->rohc_packet = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+	//rcouple->ip_packet = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+
 	return 0;
 }
 
@@ -137,6 +140,9 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 //	kfree(rcouple->rohc_packet_out);
 //	kfree(rcouple->feedback_to_send_buf);
 //	kfree(rcouple->rcvd_feedback_buf);
+
+	//kfree(rcouple->rohc_packet);
+	//kfree(rcouple->ip_packet);
 
 	return 0;
 
