@@ -255,8 +255,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		goto error;
 	}
 
-	//rohc_buf_push(&rohc_packet, rcouple->feedback_to_send->len);
-	//rohc_buf_reset(rcouple->feedback_to_send);
+	rohc_buf_push(&ip_packet, feedback_to_send.len);
+	rohc_buf_reset(feedback_to_send);
 
 	return 0;
 
