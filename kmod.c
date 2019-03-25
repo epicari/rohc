@@ -244,7 +244,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//rohc_buf_append_buf(rcouple->rohc_packet, rcouple->feedback_to_send);
 	//rohc_buf_pull(rcouple->rohc_packet, rcouple->feedback_to_send->len);
 
-	status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, rcouple->rohc_packet);
+	status = rohc_compress4(rcouple->compressor, &(rcouple->ip_packet), rcouple->rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
@@ -289,7 +289,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, rcouple->ip_packet, 
 	//						rcouple->rcvd_feedback, rcouple->feedback_to_send);
 
-	status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, rcouple->ip_packet, 
+	status = rohc_decompress3(rcouple->decompressor, rcouple->rohc_packet, &(rcouple->ip_packet), 
 							NULL, NULL);
 
 	if(status == ROHC_STATUS_OK) {
