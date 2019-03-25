@@ -233,7 +233,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	feedback_to_send->time.sec = 0;
 	feedback_to_send->time.nsec = 0;
 	feedback_to_send->data = rcouple->feedback_to_send_buf;
-	feedback_to_send->max_len = MAX_ROHC_SIZE;
+	feedback_to_send->max_len = BUFFER_SIZE;
 	feedback_to_send->offset = 0;
 	feedback_to_send->len = 0;
 
@@ -295,7 +295,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	feedback_to_send->time.sec = 0;
 	feedback_to_send->time.nsec = 0;
 	feedback_to_send->data = rcouple->feedback_to_send_buf;
-	feedback_to_send->max_len = MAX_ROHC_SIZE;
+	feedback_to_send->max_len = BUFFER_SIZE;
 	feedback_to_send->offset = 0;
 	feedback_to_send->len = 0;
 
