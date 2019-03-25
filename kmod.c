@@ -124,8 +124,8 @@ static int rohc_release_init(struct rohc_init *rcouple) {
 	rcouple->feedback_to_send->data = rcouple->feedback_to_send_buf;
 	rcouple->feedback_to_send->max_len = BUFFER_SIZE;
 	rcouple->feedback_to_send->offset = 0;
-*/	rcouple->feedback_to_send->len = 0;
-
+	rcouple->feedback_to_send->len = 0;
+*/
 	rohc_comp_free(rcouple->compressor);
 	rohc_decomp_free(rcouple->decompressor);
 
