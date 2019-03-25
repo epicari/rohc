@@ -228,8 +228,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//uint8_t rohc_packet_out[BUFFER_SIZE];
 	//uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	//uint8_t feedback_to_send_buf[BUFFER_SIZE];
-	rcouple.ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
-	rcouple.rohc_packet = rohc_buf_init_empty(rcouple.rohc_packet_out, BUFFER_SIZE);
+	rcouple->ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
+	rcouple->rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	//rcouple->rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 	//rcouple->feedback_to_send = rohc_buf_init_empty(feedback_to_send_buf, BUFFER_SIZE);
 
@@ -238,7 +238,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//rohc_buf_append_buf(rcouple->rohc_packet, rcouple->feedback_to_send);
 	//rohc_buf_pull(rcouple->rohc_packet, rcouple->feedback_to_send->len);
 
-	status = rohc_compress4(rcouple.compressor, rcouple.ip_packet, rcouple.rohc_packet);
+	status = rohc_compress4(rcouple->compressor, rcouple->ip_packet, rcouple->rohc_packet);
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
