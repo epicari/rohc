@@ -224,9 +224,11 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	};
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
-
+/*
 	uint8_t rohc_pkt_buf[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
+*/
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(skb->data, BUFFER_SIZE);
 
 	struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
 
@@ -283,10 +285,11 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	};
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
-	
+/*	
 	uint8_t decomp_buf[BUFFER_SIZE];
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, BUFFER_SIZE);
-
+*/
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(skb->data, BUFFER_SIZE);
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 
