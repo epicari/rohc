@@ -223,12 +223,14 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
+	unsigned char *packet = skb->transport_header + skb->network_header;
+
+	struct rohc_buf ip_packet = rohc_buf_init_full(packet, skb->hdr_len, arrival_time);
 /*
 	uint8_t rohc_pkt_buf[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
 */
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(skb->data, BUFFER_SIZE);
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(packet, BUFFER_SIZE);
 
 	struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
 
@@ -243,7 +245,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	//uint8_t rohc_packet_out[BUFFER_SIZE];
 	//uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	//uint8_t feedback_to_send_buf[BUFFER_SIZE];
-	//rcouple->ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
+	//rcouple->ip_packet = rohc_buf_init_full(skb->transport_header, skb->hdr_len, arrival_time);
 	//rcouple->rohc_packet = rohc_buf_init_empty(rcouple->rohc_packet_out, BUFFER_SIZE);
 	//rcouple->rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 	//rcouple->feedback_to_send = rohc_buf_init_empty(feedback_to_send_buf, BUFFER_SIZE);
@@ -284,12 +286,14 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
+	unsigned char *packet = skb->transport_header + skb->network_header;
+
+	struct rohc_buf ip_packet = rohc_buf_init_full(packet, skb->hdr_len, arrival_time);
 /*	
 	uint8_t decomp_buf[BUFFER_SIZE];
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, BUFFER_SIZE);
 */
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(skb->data, BUFFER_SIZE);
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(packet, BUFFER_SIZE);
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 
