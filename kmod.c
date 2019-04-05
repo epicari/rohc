@@ -223,10 +223,12 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	uint16_t *len = skb->len - skb->data_len;
 
-	uint8_t rohc_pkt_buf[BUFFER_SIZE];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, len, arrival_time);
+
+	uint8_t rohc_pkt_buf[len];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, len);
 
 	//struct rohc_buf rohc_packet = rohc_buf_init_empty(skb->head, BUFFER_SIZE);
 
@@ -284,10 +286,12 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	uint16_t *len = skb->len - skb->data_len;
+
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, len, arrival_time);
 	
-	uint8_t decomp_buf[BUFFER_SIZE];
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, BUFFER_SIZE);
+	uint8_t decomp_buf[len];
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, len);
 
 	//struct rohc_buf decomp_packet = rohc_buf_init_empty(header, BUFFER_SIZE);
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
