@@ -223,7 +223,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
 
 	uint8_t rohc_pkt_buf[BUFFER_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
