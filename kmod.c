@@ -284,6 +284,8 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_DECOMP\n");
 
 	struct timespec unix_ts;
+	struct tcphdr *tphdr;
+	tphdr = (struct tcphdr *)skb_transport_header(skb);
 	
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
@@ -292,12 +294,12 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	//uint16_t *len = skb->len - skb->data_len;
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
-/*	
-	uint8_t decomp_buf[skb->data_len];
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, skb->data_len);
-*/
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(skb->data, skb->data_len);
+	struct rohc_buf ip_packet = rohc_buf_init_full(tphdr, skb->hdr_len, arrival_time);
+	
+	uint8_t decomp_buf[skb->hdr_len];
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, skb->hdr_len);
+
+	//struct rohc_buf decomp_packet = rohc_buf_init_empty(skb->data, skb->data_len);
 
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
@@ -350,7 +352,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		goto error;
 	}
 
-	skb_set_transport_header(skb, &rohc_packet.offset);
+	//skb_set_transport_header(skb, &rohc_packet.offset);
 
 
 	return 0;
