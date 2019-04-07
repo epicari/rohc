@@ -217,6 +217,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_COMP\n");
 
 	struct timespec unix_ts;
+	struct tcphdr *tphdr;
+	tphdr = (struct tcphdr *)skb_transport_header(skb);
 	
 	const struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
@@ -225,12 +227,12 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	//uint16_t *len = skb->len - skb->data_len;
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
-/*
-	uint8_t rohc_pkt_buf[skb->data_len];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, skb->data_len);
-*/
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(skb->data, skb->data_len);
+	struct rohc_buf ip_packet = rohc_buf_init_full(tphdr, skb->hdr_len, arrival_time);
+
+	uint8_t rohc_pkt_buf[skb->hdr_len];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, skb->hdr_len);
+
+//	struct rohc_buf rohc_packet = rohc_buf_init_empty(skb->data, skb->data_len);
 
 	struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, BUFFER_SIZE);
 
@@ -265,7 +267,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		pr_info("Compression failed\n");
 		goto error;
 	}
-	skb_reset_transport_header(skb);
+
+	//skb_set_transport_header(skb, &rohc_packet.offset);
 
 	rohc_buf_push(&ip_packet, feedback_to_send.len);
 	rohc_buf_reset(&feedback_to_send);
@@ -295,6 +298,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, skb->data_len);
 */
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(skb->data, skb->data_len);
+
 	uint8_t rcvd_feedback_buf[BUFFER_SIZE];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, BUFFER_SIZE);
 
@@ -346,7 +350,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		goto error;
 	}
 
-	skb_reset_transport_header(skb);
+	skb_set_transport_header(skb, &rohc_packet.offset);
 
 
 	return 0;
@@ -435,16 +439,16 @@ static int my_comp(void) {
 	rohc_release_decomp(&rinit);
 
 	nfin.hook = hook_decomp;
-    //nfout.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
-	nfin.hooknum = NF_INET_LOCAL_IN;
+    nfin.hooknum = NF_INET_PRE_ROUTING; // hook in ip_rcv()
+	//nfin.hooknum = NF_INET_LOCAL_IN;
     nfin.pf = PF_INET;
     nfin.priority = NF_IP_PRI_LAST;
 	nfin.priv = NULL;
 	nf_register_net_hook(&init_net, &nfin);
 
     nfout.hook = hook_comp;
-    //nfin.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
-	nfout.hooknum = NF_INET_LOCAL_OUT;
+    nfout.hooknum = NF_INET_POST_ROUTING; // hook in ip_finish_output()
+	//nfout.hooknum = NF_INET_LOCAL_OUT;
     nfout.pf = PF_INET;
     nfout.priority = NF_IP_PRI_LAST;
 	nfout.priv = NULL;
