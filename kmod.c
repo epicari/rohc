@@ -204,13 +204,12 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
+		skb->data = rohc_buf_data(rohc_packet);
 	}
 	else {
 		pr_info("Compression failed\n");
 		goto error;
 	}
-
-	skb->data = rohc_buf_data(rohc_packet);
 
 //	rohc_buf_push(&ip_packet, feedback_to_send.len);
 //	rohc_buf_reset(&feedback_to_send);
