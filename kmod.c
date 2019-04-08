@@ -64,7 +64,7 @@ static struct rohc_init {
 
 };
 
-//struct sk_buff *r_skb = skb;
+struct sk_buff *r_skb = skb;
 static struct rohc_init rinit;
 
 static struct nf_hook_ops nfin;
@@ -184,7 +184,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	pr_info("ROHC_COMP\n");
 
-	struct sk_buff *r_skb = skb;
+	//struct sk_buff *r_skb = skb;
 
 	struct timespec unix_ts;
 	
