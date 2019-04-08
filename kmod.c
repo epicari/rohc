@@ -56,7 +56,7 @@ static struct rohc_init {
 
 struct sk_buff *r_skb;
 struct timespec unix_ts;
-struct rohc_ts arrival_time;
+struct rohc_ts *arrival_time;
 
 static struct rohc_init rinit;
 
