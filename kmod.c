@@ -207,7 +207,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
 		r_skb->data = rohc_buf_data(rohc_packet);
-		skb.skb_push(r_skb, r_skb->len);
+		pr_info("data : %d", r_skb->data);
+		r_skb->len = rohc_packet.len;
 	}
 	else {
 		pr_info("Compression failed\n");
