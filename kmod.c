@@ -231,7 +231,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(&skb->data, skb->data_len, arrival_time);
 	
 	uint8_t decomp_buf[skb->data_len];
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, skb->data_len);
@@ -258,6 +258,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	if(status == ROHC_STATUS_OK) {
 		pr_info("ROHC Decompression\n");
+		skb->data = rohc_buf_data(&decomp_packet);
 	}
 
 	else {
@@ -270,8 +271,6 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		goto error;
 	}
 */
-	skb->data = rohc_buf_data(decomp_packet);
-
 
 	return 0;
 
