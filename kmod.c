@@ -43,24 +43,14 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-/** The device MTU */
-#define DEV_MTU  0xffffU
-
-/** The maximal size for the ROHC packets */
-#define MAX_ROHC_SIZE  (DEV_MTU + 100U)
-
-/** The length of the Linux Cooked Sockets header */
-#define LINUX_COOKED_HDR_LEN  16U
-
-/** The length (in bytes) of the Ethernet header */
-#define TCP_IP_HDR_LEN  40U
+//#define MAX_ROHC_SIZE = 2000;
 
 static struct rohc_init {
 
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	uint8_t feedback_to_send_buf[MAX_ROHC_SIZE];
+	//uint8_t feedback_to_send_buf[MAX_ROHC_SIZE];
 
 };
 
@@ -188,16 +178,15 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	r_skb = skb;
 	
-	const struct rohc_ts arrival_time = {
+	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
 
-	const size_t rohc_buf_size = MAX_ROHC_SIZE + TCP_IP_HDR_LEN;
-	uint8_t rohc_pkt_buf[rohc_buf_size];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, rohc_buf_size);
+	uint8_t rohc_pkt_buf[r_skb->data_len];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, r_skb->data_len);
 
 	//struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, skb->data_len);
 /*
@@ -240,16 +229,15 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	r_skb = skb;
 	
-	const struct rohc_ts arrival_time = {
+	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, skb->hdr_len, arrival_time);
 	
-	const size_t rohc_buf_size = MAX_ROHC_SIZE + TCP_IP_HDR_LEN;
-	uint8_t decomp_buf[rohc_buf_size];
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, rohc_buf_size);
+	uint8_t decomp_buf[r_skb->data_len];
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, r_skb->data_len);
 /*
 	uint8_t rcvd_feedback_buf[skb->data_len];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, skb->data_len);
