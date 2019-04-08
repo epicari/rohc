@@ -52,7 +52,6 @@ static struct rohc_init {
 
 	uint8_t feedback_to_send_buf[BUFFER_SIZE];
 
-
 };
 
 static struct rohc_init rinit;
@@ -185,8 +184,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
 
-	uint8_t rohc_pkt_buf[r_skb->hdr_len];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, r_skb->hdr_len);
+	uint8_t rohc_pkt_buf[BUFFER_SIZE];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
 
 	//struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, skb->data_len);
 /*
@@ -227,6 +226,8 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	pr_info("ROHC_DECOMP\n");
 
+	struct sk_buff *r_skb = skb;
+
 	struct timespec unix_ts;
 	
 	const struct rohc_ts arrival_time = {
@@ -234,10 +235,10 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->hdr_len, arrival_time);
 	
-	uint8_t decomp_buf[skb->data_len];
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, skb->data_len);
+	uint8_t decomp_buf[BUFFER_SIZE];
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, BUFFER_SIZE);
 /*
 	uint8_t rcvd_feedback_buf[skb->data_len];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, skb->data_len);
@@ -261,7 +262,8 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	if(status == ROHC_STATUS_OK) {
 		pr_info("ROHC Decompression\n");
-		skb->data = rohc_buf_data(decomp_packet);
+		r_skb->data = rohc_buf_data(decomp_packet);
+		skb->data = r_skb->data;
 	}
 
 	else {
