@@ -43,7 +43,7 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define MAX_ROHC_SIZE 1000
+#define MAX_ROHC_SIZE 999
 
 static struct rohc_init {
 
