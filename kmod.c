@@ -181,7 +181,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(skb->data, skb->data_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(&skb->data, skb->data_len, arrival_time);
 
 	uint8_t rohc_pkt_buf[skb->data_len];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, skb->data_len);
@@ -204,7 +204,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	if (status == ROHC_STATUS_OK) {
 		pr_info("ROHC Compression\n");
-		skb->data = rohc_buf_data(rohc_packet);
+		skb->data = rohc_buf_data(&rohc_packet);
 	}
 	else {
 		pr_info("Compression failed\n");
