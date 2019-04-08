@@ -43,17 +43,28 @@
 #include "rohc_comp.h"
 #include "rohc_decomp.h"
 
-#define BUFFER_SIZE 10000
+/** The device MTU */
+#define DEV_MTU  0xffffU
+
+/** The maximal size for the ROHC packets */
+#define MAX_ROHC_SIZE  (DEV_MTU + 100U)
+
+/** The length of the Linux Cooked Sockets header */
+#define LINUX_COOKED_HDR_LEN  16U
+
+/** The length (in bytes) of the Ethernet header */
+#define TCP_IP_HDR_LEN  40U
 
 static struct rohc_init {
 
 	struct rohc_comp *compressor;
 	struct rohc_decomp *decompressor;
 
-	uint8_t feedback_to_send_buf[BUFFER_SIZE];
+	uint8_t feedback_to_send_buf[MAX_ROHC_SIZE];
 
 };
 
+//struct sk_buff *r_skb = skb;
 static struct rohc_init rinit;
 
 static struct nf_hook_ops nfin;
@@ -80,7 +91,7 @@ static int rohc_release(struct rohc_init *rcouple) {
 	
 	pr_info("ROHC_RELEASE\n");
 
-//	rcouple->feedback_to_send_buf[BUFFER_SIZE] = kmalloc(BUFFER_SIZE, GFP_KERNEL);
+//	rcouple->feedback_to_send_buf[MAX_ROHC_SIZE] = kmalloc(MAX_ROHC_SIZE, GFP_KERNEL);
 
 	return 0;
 }
@@ -184,8 +195,9 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
 
-	uint8_t rohc_pkt_buf[BUFFER_SIZE];
-	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, BUFFER_SIZE);
+	const size_t rohc_buf_size = MAX_ROHC_SIZE + TCP_IP_HDR_LEN;
+	uint8_t rohc_pkt_buf[rohc_buf_size];
+	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, rohc_buf_size);
 
 	//struct rohc_buf feedback_to_send = rohc_buf_init_empty(rcouple->feedback_to_send_buf, skb->data_len);
 /*
@@ -226,8 +238,6 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	pr_info("ROHC_DECOMP\n");
 
-	struct sk_buff *r_skb = skb;
-
 	struct timespec unix_ts;
 	
 	const struct rohc_ts arrival_time = {
@@ -237,8 +247,9 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, skb->hdr_len, arrival_time);
 	
-	uint8_t decomp_buf[BUFFER_SIZE];
-	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, BUFFER_SIZE);
+	const size_t rohc_buf_size = MAX_ROHC_SIZE + TCP_IP_HDR_LEN;
+	uint8_t decomp_buf[rohc_buf_size];
+	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, rohc_buf_size);
 /*
 	uint8_t rcvd_feedback_buf[skb->data_len];
 	struct rohc_buf rcvd_feedback = rohc_buf_init_empty(rcvd_feedback_buf, skb->data_len);
