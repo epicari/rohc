@@ -211,7 +211,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		pr_info("Compression failed\n");
 		goto error;
 	}
-	pr_info("data: ", rohc_buf_data(rohc_packet));
+	pr_info("data: %d", rohc_buf_data(rohc_packet));
 	//pr_info("data : %p", r_skb->data);
 	//r_skb->len = rohc_packet.len;
 
