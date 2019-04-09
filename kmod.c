@@ -189,7 +189,7 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	};
 
 	struct rohc_buf ip_packet = rohc_buf_init_full(tph, sizeof(struct tcphdr), arrival_time);
-	pr_info("Origin data: %p", r_skb->data);
+	pr_info("Origin data: %p", tph);
 
 	uint8_t rohc_pkt_buf[MAX_ROHC_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, MAX_ROHC_SIZE);
