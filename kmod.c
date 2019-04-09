@@ -54,6 +54,9 @@ static struct rohc_init {
 
 };
 
+struct iphdr *iph;
+struct tcphdr *tph;
+
 struct sk_buff *r_skb;
 struct timespec unix_ts;
 
@@ -177,13 +180,16 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_COMP\n");
 
 	r_skb = skb;
+
+	tph = tcp_hdr(r_skb);
 	
 	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(tph, sizeof(struct tcphdr), arrival_time);
+	pr_info("Origin data: %p", r_skb->data);
 
 	uint8_t rohc_pkt_buf[MAX_ROHC_SIZE];
 	struct rohc_buf rohc_packet = rohc_buf_init_empty(rohc_pkt_buf, MAX_ROHC_SIZE);
@@ -229,13 +235,14 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_DECOMP\n");
 
 	r_skb = skb;
+	tph = tcp_hdr(r_skb);
 	
 	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, sizeof(struct tcphdr), arrival_time);
 	
 	uint8_t decomp_buf[MAX_ROHC_SIZE];
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, MAX_ROHC_SIZE);
@@ -293,8 +300,6 @@ static unsigned int hook_comp (void *priv,
                         const struct nf_hook_state *state) {
     
 	int rts;
-    struct iphdr *iph;
-	struct tcphdr *tph;
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
@@ -327,8 +332,6 @@ static unsigned int hook_decomp (void *priv,
                         const struct nf_hook_state *state) {
     
     int rts;
-	struct iphdr *iph;
-	struct tcphdr *tph;
 
 	iph = ip_hdr(skb);
 	tph = tcp_hdr(skb);
