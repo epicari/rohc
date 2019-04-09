@@ -235,7 +235,7 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 		.nsec = unix_ts.tv_nsec
 	};
 
-	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, skb->hdr_len, arrival_time);
+	struct rohc_buf ip_packet = rohc_buf_init_full(r_skb->data, r_skb->hdr_len, arrival_time);
 	
 	uint8_t decomp_buf[MAX_ROHC_SIZE];
 	struct rohc_buf decomp_packet = rohc_buf_init_empty(decomp_buf, MAX_ROHC_SIZE);
