@@ -181,7 +181,8 @@ static int rohc_comp(struct rohc_init *rcouple, struct sk_buff *skb) {
 
 	r_skb = skb;
 
-	tph = tcp_hdr(r_skb);
+	//tph = tcp_hdr(r_skb);
+	tph = (struct tcphdr *)skb_transport_header(r_skb);
 	
 	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
@@ -235,7 +236,8 @@ static int rohc_decomp(struct rohc_init *rcouple, struct sk_buff *skb) {
 	pr_info("ROHC_DECOMP\n");
 
 	r_skb = skb;
-	tph = tcp_hdr(r_skb);
+	//tph = tcp_hdr(r_skb);
+	tph = (struct tcphdr *)skb_transport_header(r_skb);
 	
 	struct rohc_ts arrival_time = {
 		.sec = unix_ts.tv_sec ,
